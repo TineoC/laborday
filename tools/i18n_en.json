@@ -1,0 +1,296 @@
+{
+  "_comment": "English layer. Spanish lives in places_final.json and build_page.py; this file only holds the translations. Never add a fact here that is not already in the Spanish copy.",
+
+  "ui": {
+    "htmlLang": "en",
+    "title": "Hershey — Labor Day Weekend 2026",
+    "h1": "🍫 Hershey — Labor Day Weekend",
+    "dates": "Fri Sep 4 · Sat 5 · Sun 6 · Mon 7, 2026",
+    "origin": "All distances and drive times are from the Hersheypark entrance",
+    "noteTicket": "<b>⏰ Happy Hours Ticket:</b> park entry from <b>5:00 pm to close</b>. Evenings are already spoken for — everything here is a <b>morning or early-afternoon</b> plan. Bonus: with that ticket <b>ZooAmerica is free</b> if you enter from inside the park.",
+    "noteHours": "<b>Hours:</b> the ones marked <span style=\"color:#67c07a\">✓ confirmed</span> came from the venue's own website. The <span style=\"color:#f0916f\">⚠ check</span> ones are estimates — call ahead or check Google Maps. <b>⭐ Star ratings are for reference</b>; the \"Maps + reviews\" button opens Google Maps with the real ones.",
+    "quickLabel": "Quick views:",
+    "quickRec": "⭐ Recommended",
+    "quickEvent": "🎉 Has an event that weekend",
+    "quickFree": "💵 Free first",
+    "quickLookouts": "🏔️ Lookouts",
+    "quickMonday": "🇺🇸 Open on Monday",
+    "anyDay": "Any day",
+    "onlyEvents": "🎉 Events only",
+    "share": "🔗 Copy link to this view",
+    "shareOk": "✓ Link copied",
+    "sortMi": "Closest first",
+    "sortStars": "Best rated",
+    "sortFree": "Free first",
+    "countPlaces": "places",
+    "countFree": "free",
+    "countEvents": "with an event that weekend",
+    "distance": "Distance",
+    "price": "Price",
+    "driving": "min drive",
+    "schedHead": "Weekend hours",
+    "verOk": "✓ confirmed",
+    "verChk": "⚠ check",
+    "recommended": "RECOMMENDED",
+    "free": "FREE",
+    "linkMaps": "⭐ Maps + reviews",
+    "linkDir": "🧭 Directions",
+    "linkSite": "Website",
+    "photo": "photo",
+    "photos": "photos",
+    "swipe": "swipe →",
+    "popupStart": "Starting point",
+    "popupHappy": "Happy Hours: 5pm → close",
+    "popupReviews": "Reviews and hours →",
+    "popupDir": "Directions →",
+    "footNote": "Distances and drive times computed with OSRM over OpenStreetMap data · map &copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> · hours and events from each venue's own website · star ratings from Google Maps (reference). Photos from each venue's own site or from Wikimedia/Wikipedia — swipe the image to see more.",
+    "footCode": "Code on GitHub",
+    "footContrib": "How to contribute",
+    "footIssue": "Report a wrong fact",
+    "footCopy": "&copy; 2026 Christopher Tineo. Released under the <a href=\"https://github.com/TineoC/laborday/blob/main/LICENSE\" target=\"_blank\" rel=\"noopener\">MIT license</a>. An informational guide made for a family trip — not affiliated with Hersheypark, The Hershey Company or any of the places listed. Check hours and prices before you head out.",
+    "langLabel": "Idioma / Language"
+  },
+
+  "days": ["Fri", "Sat", "Sun", "Mon"],
+
+  "cats": {
+    "Todos": "All",
+    "⭐ Recomendados": "⭐ Recommended",
+    "Miradores": "Lookouts",
+    "Parques": "Parks",
+    "Conocer": "Sightseeing",
+    "Agua & Aventura": "Water & Adventure",
+    "Eventos": "Events",
+    "Cervezas": "Breweries"
+  },
+
+  "sched": {
+    "Amanecer–anochecer": "Dawn–dusk",
+    "Cerrado (feriado)": "Closed (holiday)",
+    "Feriado — probablemente cerrado": "Holiday — probably closed",
+    "Muchas tiendas cerradas": "Many shops closed",
+    "No abre viernes": "Not open Friday",
+    "Tiendas 10am–5pm": "Shops 10am–5pm",
+    "Tiendas 10am–6pm": "Shops 10am–6pm",
+    "Tours 8:30am–4pm": "Tours 8:30am–4pm",
+    "Tours 9am–4pm": "Tours 9am–4pm",
+    "Varía — feriado": "Varies — holiday",
+    "ÚLTIMO DÍA de temporada": "LAST DAY of the season",
+    "10am–3pm (Gallery Day)": "10am–3pm (Gallery Day)",
+    "6pm–9pm (durante el Jazz)": "6pm–9pm (during the Jazz night)",
+    "9am–5pm (con reserva)": "9am–5pm (by reservation)",
+    "11am–8pm + fuegos artificiales": "11am–8pm + fireworks",
+    "Portones 6pm · música 7–9pm": "Gates 6pm · music 7–9pm",
+    "Parque amanecer–anochecer · Mansión 10am–4:30pm": "Park dawn–dusk · Mansion 10am–4:30pm",
+    "Parque amanecer–anochecer · Mansión 12pm–4:30pm": "Park dawn–dusk · Mansion 12pm–4:30pm",
+    "Solo el parque (mansión cierra lunes)": "Park only (mansion closed Monday)"
+  },
+
+  "imgsrc": {
+    "sitio oficial": "official site",
+    "Wikimedia / Wikipedia": "Wikimedia / Wikipedia"
+  },
+
+  "places": {
+    "Hershey's Chocolate World": {
+      "town": "Hershey (next to the park)",
+      "price": "FREE entry and ride · Create Your Own Bar $27 · Trolley $24",
+      "why": "The chocolate tour ride is FREE, runs 10 min, and they hand you chocolate at the end. Huge store.",
+      "tip": "Cheapest thing all weekend: the free ride. Go early — after 11am it's a mob."
+    },
+    "ZooAmerica": {
+      "town": "Hershey (attached to the park)",
+      "price": "$16 adult · $13 child · FREE with a Hersheypark ticket",
+      "why": "11-acre zoo with North American animals only: bears, wolves, bobcat, alligators, owls.",
+      "tip": "Free entry from inside Hersheypark with your Happy Hours ticket. Use it."
+    },
+    "The Hershey Story Museum": {
+      "town": "Downtown Hershey",
+      "price": "Museum $17 adult / $13 child · Chocolate Lab $22 · Tasting $15",
+      "why": "The story of Milton Hershey. The Chocolate Lab (you make your own bar) and the tasting of chocolates from 4 countries are the best parts.",
+      "tip": "The Chocolate Lab fills up — book online NOW, not at the door."
+    },
+    "YAH Brew": {
+      "town": "Hershey",
+      "price": "Pint $6–8",
+      "why": "Small taproom in downtown Hershey. Quick, casual, walkable from the center.",
+      "tip": "A 45-minute stop, not a destination."
+    },
+    "Jazz at the Barnyard": {
+      "town": "Hershey History Center",
+      "price": "$10–15 · kids free",
+      "why": "Live outdoor jazz at the historic barn. Intimate — bring a folding chair.",
+      "tip": "Clashes with the park's Happy Hours on Friday. Pick one.",
+      "event": "🎷 FRIDAY 4: Third Stream band concert, 7–9pm. Gates and the photo exhibit open at 6pm."
+    },
+    "Through the Lens of Hershey": {
+      "town": "Hershey History Center",
+      "price": "FREE / donation",
+      "why": "Historic Hershey photography exhibit. Short, and air-conditioned.",
+      "tip": "30–45 min. Perfect for killing time if it rains.",
+      "event": "📸 Photography by John Martin. Fri 4 preview night (6–9pm, during the Jazz) and Sat 5 Gallery Day (10am–3pm)."
+    },
+    "Hershey Gardens": {
+      "town": "Hershey",
+      "price": "$16 adult · $13 child (3–12) · under 3 free",
+      "why": "23 acres of themed gardens + a Butterfly Atrium with hundreds of butterflies flying loose + an interactive Children's Garden.",
+      "tip": "Hit the butterfly atrium first — they're more active in the morning. 1.5–2 h.",
+      "event": "🎨 Fri 4 to Sun 6: Hershey Area Art Association Show & Sale ('Blooming Art'), 9am–6pm. Friday 12–12:30pm: live feeding at the Zoology Zone."
+    },
+    "Hidden Still Spirits": {
+      "town": "Hershey",
+      "price": "Cocktail $12–14 · Flight $15 · Tour + tasting $20",
+      "why": "Local whiskey, rum and vodka distillery. Serious cocktails in a speakeasy-ish bar.",
+      "tip": "Grown-up room — not the plan with kids."
+    },
+    "Rotunda Brew Pub": {
+      "town": "Hershey (Hershey Lodge)",
+      "price": "Pint $8–10 · Food $15–22",
+      "why": "Brewpub inside the Hershey Lodge. Convenient and close, at hotel prices.",
+      "tip": "Worst value on the list. Only if you're wiped out and don't want to drive."
+    },
+    "Tröegs Independent Brewing": {
+      "town": "Hershey",
+      "price": "Pint $7–9 · Flight $12 · Food $12–18 · Tour FREE",
+      "why": "The #1 brewery in the area. Huge industrial hall, a snack bar with good food, and a FREE self-guided tour down hallways with windows onto production.",
+      "tip": "If you do ONE brewery, this one. Genuinely kid-friendly — whole families in there.",
+      "event": "🍺 Open on Labor Day Monday with special hours (11:30am–9pm)."
+    },
+    "AACA Automobile Museum": {
+      "town": "Hershey",
+      "price": "$16 adult · $12 child (4–12) · under 4 free",
+      "why": "First-rate classic car museum. Cars from the 1890s to today, buses, and the Tucker exhibit. Big, and air-conditioned.",
+      "tip": "The #1 rain plan. Easily 2 h inside.",
+      "event": "🚗 SATURDAY 5: Duryea Day (antique car show, 9am–3pm) + Ollie Day (9am–5pm) + the talk 'Board Tracks: Speed, Spectacle & Risk in Early Auto Racing'."
+    },
+    "Rubber Soul Brewing": {
+      "town": "Hummelstown",
+      "price": "Pint $6–8 · Food $12–16",
+      "why": "Small brewpub with its own kitchen in historic downtown Hummelstown. Beatles theme.",
+      "tip": "Perfect combo: Indian Echo Caverns in the morning, lunch here (5 min away)."
+    },
+    "Cocoa Kayak Rentals": {
+      "town": "Palmyra — Swatara Creek",
+      "price": "Kayak $30–40 · Tube $20 · Canoe $45 (per trip)",
+      "why": "Easy float down Swatara Creek, no rapids. They shuttle you upstream and pick you up.",
+      "tip": "Book NOW — Labor Day sells out. Depends on water level, so call if it hasn't rained."
+    },
+    "Indian Echo Caverns": {
+      "town": "Hummelstown",
+      "price": "$22 adult · $14 child (3–11) · Gem mining $12–20",
+      "why": "Limestone cave at a steady 52°F. 45-minute guided tour. Outside there's gem mining and farm animals for the kids.",
+      "tip": "The #1 pick on a hot day. Bring a sweater — it's genuinely cold inside. Wet, slippery floor."
+    },
+    "Snitz Creek Brewery": {
+      "town": "Campbelltown",
+      "price": "Pint $5–7 · Flight $10",
+      "why": "Unpretentious local brewery, among the best prices around. Not touristy at all.",
+      "tip": "Cheapest on the list."
+    },
+    "The Vineyard at Hershey": {
+      "town": "Middletown",
+      "price": "Free entry · glass $9–12 · flight $15–18",
+      "why": "Vineyard with its own wines and beers, live music, and a big patio looking over the vines.",
+      "tip": "Open space — works well for a big group with kids running around."
+    },
+    "Reservoir Park": {
+      "town": "Harrisburg",
+      "price": "FREE",
+      "why": "The highest point in Harrisburg — view of the skyline and the Capitol dome. You drive right to the top, zero hiking.",
+      "tip": "Lookout for the lazy: park and you're there. Good at sunset."
+    },
+    "Mt. Gretna Lake & Beach": {
+      "town": "Mt. Gretna",
+      "price": "$12 adult · $10 child",
+      "why": "Lake with an imported sand beach, water slide, floating trampoline and snack bar. 1950s summer-town vibe.",
+      "tip": "HEADS UP: the last day of the season is normally Labor Day. CALL before you drive out.",
+      "event": "🏖️ Labor Day Monday is usually the LAST day of the season. Call first."
+    },
+    "Coleman Memorial Park": {
+      "town": "Lebanon",
+      "price": "FREE",
+      "why": "Big municipal park with a giant playground, pool, courts and shaded picnic areas.",
+      "tip": "Cheap way to burn off the kids' energy without paying anything."
+    },
+    "Pennsylvania State Capitol": {
+      "town": "Harrisburg",
+      "price": "FREE (guided tours free)",
+      "why": "One of the most beautiful capitols in the U.S. — gilded dome modeled on St. Peter's, marble staircase, murals. Teddy Roosevelt called it 'the handsomest building I ever saw'.",
+      "tip": "Free and spectacular. Confirm whether it opens on Labor Day Monday. Pair it with Kipona."
+    },
+    "Boyd Big Tree Preserve": {
+      "town": "Harrisburg",
+      "price": "FREE",
+      "why": "1,000 acres of mature forest with huge trees. Trails from easy to a climb up the ridge.",
+      "tip": "Full shade — the best pick on a hot day."
+    },
+    "Second Mountain Hawk Watch": {
+      "town": "Fort Indiantown Gap",
+      "price": "FREE",
+      "why": "Rocky overlook above the valley. Early September = peak hawk and eagle migration. You can almost drive all the way up.",
+      "tip": "Little walking, big view. Bring binoculars if you have them."
+    },
+    "Memorial Lake State Park": {
+      "town": "Grantville",
+      "price": "FREE",
+      "why": "85-acre lake with a flat 1.5-mile loop trail, picnic tables, fishing. Very quiet and close by.",
+      "tip": "Easiest park on the list with kids. Bring food and make it a picnic."
+    },
+    "Kipona Festival": {
+      "town": "Harrisburg — City Island",
+      "price": "FREE entry · food $10–20 per person",
+      "why": "The biggest event of the weekend. Food, crafts, live music, craft beer and a Native American powwow along the Susquehanna River.",
+      "tip": "City Island parking fills up — get there before noon, or park downtown and walk across the pedestrian bridge.",
+      "event": "🎉 110th Kipona · Family Fun Zone, Giant Puppet Parade, Keystone Dock Dogs, Art in the Park, food trucks, beer/wine garden. FIREWORKS on Sunday. Metered parking FREE Sunday and Monday; $5 at the River Street Garage on Saturday 8am–5pm."
+    },
+    "Cornwall Iron Furnace": {
+      "town": "Cornwall",
+      "price": "$8 adult · $5 child",
+      "why": "The only intact 18th-century iron furnace in the Western Hemisphere. National historic site, small and unusual.",
+      "tip": "45 min. Fits nicely on the way to Mt. Gretna or Governor Dick."
+    },
+    "Wildwood Park": {
+      "town": "Harrisburg",
+      "price": "FREE",
+      "why": "Lake with a wooden boardwalk over the wetland, turtles, herons and lotus flowers. Flat 3-mile trail — you can do just a piece of it.",
+      "tip": "Strollers roll fine. Pair it with Kipona (10 min away)."
+    },
+    "Fort Hunter Mansion & Park": {
+      "town": "Harrisburg",
+      "price": "Park FREE · mansion $9 adult / $5 child",
+      "why": "An 1814 mansion above the Susquehanna, with gardens, a barn and a riverside trail. Gorgeous river view.",
+      "tip": "The park alone is worth it and it's free. The mansion is optional."
+    },
+    "Governor Dick Observation Tower": {
+      "town": "Mt. Gretna / Elizabethtown",
+      "price": "FREE (free parking)",
+      "why": "THE BEST LOOKOUT around. A 66-foot concrete tower you climb by interior stairs — 360° view over 4 counties. About a 1-mile hike each way through woods, moderate.",
+      "tip": "Best thing all weekend and it's free. Bring water and closed shoes. It's dark inside the tower — use your phone flashlight."
+    },
+    "Swatara State Park": {
+      "town": "Lebanon Co.",
+      "price": "FREE",
+      "why": "3,500 acres. Flat gravel rail-trail for walking or biking, the creek to dip your feet in, and Devonian fossils in the road cut.",
+      "tip": "Fossil area: kids find real trilobites. You're allowed to take them."
+    },
+    "Hawk Rock Overlook": {
+      "town": "Duncannon",
+      "price": "FREE",
+      "why": "Appalachian Trail hike up to a rock with a view of the Susquehanna River and the town of Duncannon.",
+      "tip": "~1.2 mi each way, steep. Not for little kids or for a hot day."
+    },
+    "Downtown Lititz": {
+      "town": "Lititz",
+      "price": "Walking FREE · Julius Sturgis Pretzel tour $6",
+      "why": "Voted 'America's coolest small town'. A main street from the 1750s, the country's oldest pretzel factory (you twist your own), the Wilbur chocolate shop, and a park with a creek.",
+      "tip": "Prettiest stroll on the list. A full half-day. Many shops close on Sunday.",
+      "event": "🛍️ Fri 4 and Sat 5: 'Thanks for the Love Party' at Bunyaad Marketplace — 20% off everything."
+    },
+    "Waggoner's Gap Hawk Watch": {
+      "town": "Carlisle",
+      "price": "FREE",
+      "why": "Legendary Audubon lookout on the Blue Mountain ridge. In September hundreds of raptors pass through daily. Huge view of the Cumberland Valley.",
+      "tip": "Short but rocky climb from the parking lot. Farthest place on this list."
+    }
+  }
+}

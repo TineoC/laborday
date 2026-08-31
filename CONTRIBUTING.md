@@ -64,7 +64,11 @@ imágenes, no las hospeda.
 
 ## Estilo
 
-- El texto de la página es **español informal**. Mantenlo así.
+- El texto base es **español informal**. Mantenlo así.
+- La página es bilingüe. El inglés vive en `tools/i18n_en.json` y es una
+  **traducción** del español, no una fuente nueva de datos. Si agregas o
+  cambias un lugar, actualiza también su bloque en ese archivo — el build falla
+  si falta.
 - Los nombres propios de lugares van en inglés, como aparecen en Google Maps.
 - Nada de dependencias nuevas. La página es un archivo HTML con Leaflet desde
   CDN, y así se queda.
