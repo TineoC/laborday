@@ -19,6 +19,7 @@ CNAME                       custom domain for GitHub Pages
 tools/places_seed.json      the 32 places: name, category, coords, price, copy
 tools/places_final.json     enriched dataset the page is built from
 tools/i18n_en.json          English translation of the UI and of every place
+tools/agenda.json           suggested per-day agenda, hand-curated; no script writes it
 tools/img_harvest.json      photo URLs per place
 tools/build_page.py         renders places_final.json -> index.html
 tools/enrich_distances.py   OSRM driving distance/time from Hersheypark

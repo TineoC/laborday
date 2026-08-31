@@ -1,0 +1,41 @@
+{
+  "_comment": "Agenda sugerida, curada a mano. Ningún script escribe este archivo. Español es la fuente de verdad; cada label y cada note necesita su entrada en i18n_en.json -> agenda. d = índice del día igual que days[]/sched[] en places_final.json (0=Vie, 1=Sáb, 2=Dom, 3=Lun). Un slot tiene exactamente uno de: n (nombre exacto de un lugar), park (bloque de Hersheypark), label (texto libre).",
+  "days": [
+    {
+      "d": 0,
+      "slots": [
+        { "t": "7–8pm", "label": "Llegada — la mayoría sale del trabajo" },
+        { "t": "8:00pm", "park": true, "opt": true, "note": "Últimas horas del parque — confirmen la hora de cierre del viernes." },
+        { "t": "8:00pm", "n": "Tröegs Independent Brewing", "opt": true, "note": "Cierra a las 10pm el viernes." },
+        { "t": "8:00pm", "n": "Hershey's Chocolate World", "opt": true, "note": "Cierra a las 9pm — solo si llegan temprano." }
+      ]
+    },
+    {
+      "d": 1,
+      "slots": [
+        { "t": "9:30am", "n": "Indian Echo Caverns", "note": "Abre 9am–5pm. Ir temprano y salir con tiempo." },
+        { "t": "11:30am", "n": "Kipona Festival", "note": "Parqueo $5 en River Street Garage el sábado 8am–5pm." },
+        { "t": "3:30pm", "label": "Regreso a Hershey" },
+        { "t": "5:00pm", "park": true }
+      ]
+    },
+    {
+      "d": 2,
+      "slots": [
+        { "t": "9:30am", "n": "Pennsylvania State Capitol", "note": "Tours 9am–4pm el domingo." },
+        { "t": "11:30am", "n": "Wildwood Park" },
+        { "t": "3:30pm", "label": "Regreso a Hershey" },
+        { "t": "5:00pm", "park": true, "note": "Los fuegos artificiales de Kipona son esta noche — hay que elegir." }
+      ]
+    },
+    {
+      "d": 3,
+      "slots": [
+        { "t": "9:00am", "n": "Governor Dick Observation Tower", "note": "Amanecer–anochecer, sin horario fijo." },
+        { "t": "11:30am", "n": "Memorial Lake State Park" },
+        { "t": "2:00pm", "n": "Tröegs Independent Brewing", "note": "Horario especial de Labor Day: 11:30am–9pm." },
+        { "t": "5:00pm", "park": true }
+      ]
+    }
+  ]
+}
