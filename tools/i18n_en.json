@@ -7,7 +7,7 @@
     "h1": "🍫 Hershey — Labor Day Weekend",
     "dates": "Fri Sep 4 · Sat 5 · Sun 6 · Mon 7, 2026",
     "origin": "All distances and drive times are from the Hersheypark entrance",
-    "noteTicket": "<b>⏰ Happy Hours Ticket:</b> park entry from <b>5:00 pm to close</b>. Evenings are already spoken for — everything here is a <b>morning or early-afternoon</b> plan. Bonus: with that ticket <b>ZooAmerica is free</b> if you enter from inside the park.",
+    "noteTicket": "<b>⏰ Happy Hours Ticket:</b> the park is <b>Saturday, 5:00 pm to close</b>. That day everything else is a <b>morning or early-afternoon</b> plan. Friday is arrival plus something social; Sunday and Monday evenings are free. Bonus: with that ticket <b>ZooAmerica is free</b> if you enter from inside the park.",
     "noteHours": "<b>Hours:</b> the ones marked <span style=\"color:#67c07a\">✓ confirmed</span> came from the venue's own website. The <span style=\"color:#f0916f\">⚠ check</span> ones are estimates — call ahead or check Google Maps. <b>⭐ Star ratings are for reference</b>; the \"Maps + reviews\" button opens Google Maps with the real ones.",
     "quickLabel": "Quick views:",
     "quickRec": "⭐ Recommended",
@@ -40,7 +40,7 @@
     "photos": "photos",
     "swipe": "swipe →",
     "popupStart": "Starting point",
-    "popupHappy": "Happy Hours: 5pm → close",
+    "popupHappy": "Happy Hours: Saturday 5pm → close",
     "popupReviews": "Reviews and hours →",
     "popupDir": "Directions →",
     "footNote": "Distances and drive times computed with OSRM over OpenStreetMap data · map &copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> · hours and events from each venue's own website · star ratings from Google Maps (reference). Photos from each venue's own site or from Wikimedia/Wikipedia — swipe the image to see more.",
@@ -50,7 +50,7 @@
     "footCopy": "&copy; 2026 Christopher Tineo. Released under the <a href=\"https://github.com/TineoC/laborday/blob/main/LICENSE\" target=\"_blank\" rel=\"noopener\">MIT license</a>. An informational guide made for a family trip — not affiliated with Hersheypark, The Hershey Company or any of the places listed. Check hours and prices before you head out.",
     "langLabel": "Idioma / Language",
     "agendaTitle": "Suggested agenda",
-    "agendaSub": "One plan per day, built around the Happy Hours ticket. Nothing here is booked — swap whatever you want.",
+    "agendaSub": "One plan per day: Friday is arrival, Saturday is built around the Happy Hours ticket, and Monday ends on the drive back to Newark. Nothing here is booked — swap whatever you want.",
     "agendaPark": "🎢 Hersheypark — Happy Hours (5pm → close)",
     "agendaOpt": "optional",
     "planTitle": "Build your own agenda",
@@ -70,16 +70,17 @@
 
   "agenda": {
     "Llegada — la mayoría sale del trabajo": "Arrival — most of us are coming straight from work",
-    "Últimas horas del parque — confirmen la hora de cierre del viernes.": "The park's last hours — check Friday's closing time.",
+    "Portones 6pm, música 7–9pm. Solo pasa el viernes — se agarra el final.": "Gates 6pm, music 7–9pm. Friday only — you'd catch the tail end.",
     "Cierra a las 10pm el viernes.": "Closes at 10pm on Friday.",
-    "Cierra a las 9pm — solo si llegan temprano.": "Closes at 9pm — only if you get in early.",
+    "Abre hasta las 10pm el viernes. Caminable en el centro de Hershey.": "Open until 10pm on Friday. Walkable in downtown Hershey.",
     "Abre 9am–5pm. Ir temprano y salir con tiempo.": "Open 9am–5pm. Go early and leave yourself time.",
-    "Parqueo $5 en River Street Garage el sábado 8am–5pm.": "$5 parking at River Street Garage on Saturday, 8am–5pm.",
-    "Regreso a Hershey": "Drive back to Hershey",
+    "Abre 9am–6pm. El art show va de viernes a domingo.": "Open 9am–6pm. The art show runs Friday through Sunday.",
+    "La única noche de parque — es el boleto que ya está pagado.": "The one park night — this is the ticket that's already paid for.",
     "Tours 9am–4pm el domingo.": "Tours 9am–4pm on Sunday.",
-    "Los fuegos artificiales de Kipona son esta noche — hay que elegir.": "Kipona's fireworks are tonight — you have to pick one.",
-    "Amanecer–anochecer, sin horario fijo.": "Dawn–dusk, no set hours.",
-    "Horario especial de Labor Day: 11:30am–9pm.": "Special Labor Day hours: 11:30am–9pm."
+    "Abre 11am–8pm y los fuegos artificiales son esta noche. Parquímetros gratis el domingo.": "Open 11am–8pm and the fireworks are tonight. Metered parking is free on Sunday.",
+    "Al lado del campamento y el ride es gratis.": "Next door to the campsite, and the ride is free.",
+    "Queda del lado de la I-78, camino a casa.": "It sits on the I-78 side, on the way home.",
+    "Salida hacia Newark, NJ": "Head back to Newark, NJ"
   },
 
   "cats": {
@@ -149,7 +150,7 @@
       "town": "Hershey History Center",
       "price": "$10–15 · kids free",
       "why": "Live outdoor jazz at the historic barn. Intimate — bring a folding chair.",
-      "tip": "Clashes with the park's Happy Hours on Friday. Pick one.",
+      "tip": "The park is Saturday, so Friday is free for this. Bring a folding chair.",
       "event": "🎷 FRIDAY 4: Third Stream band concert, 7–9pm. Gates and the photo exhibit open at 6pm."
     },
     "Through the Lens of Hershey": {

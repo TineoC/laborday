@@ -234,8 +234,9 @@ footer a{color:var(--gold)}
 <div class="wrap">
 
   <div class="note" id="t-note1">
-    <b>⏰ Happy Hours Ticket:</b> entra al parque de <b>5:00 pm al cierre</b>.
-    Las tardes-noches ya están tomadas — todo esto va <b>en la mañana o temprano en la tarde</b>.
+    <b>⏰ Happy Hours Ticket:</b> el parque es <b>el sábado, de 5:00 pm al cierre</b>.
+    Ese día todo lo demás va <b>en la mañana o temprano en la tarde</b>.
+    El viernes es de llegada y algo social; el domingo y el lunes las tardes quedan libres.
     Bonus: con ese boleto <b>ZooAmerica es gratis</b> entrando desde adentro del parque.
   </div>
 
@@ -305,8 +306,9 @@ const UI_ES = {
   h1:"🍫 Hershey — Fin de Semana de Labor Day",
   dates:"Vie 4 · Sáb 5 · Dom 6 · Lun 7 de septiembre 2026",
   origin:"Todas las distancias y tiempos son manejando desde la entrada de Hersheypark",
-  noteTicket:'<b>⏰ Happy Hours Ticket:</b> entra al parque de <b>5:00 pm al cierre</b>. '+
-    'Las tardes-noches ya están tomadas — todo esto va <b>en la mañana o temprano en la tarde</b>. '+
+  noteTicket:'<b>⏰ Happy Hours Ticket:</b> el parque es <b>el sábado, de 5:00 pm al cierre</b>. '+
+    'Ese día todo lo demás va <b>en la mañana o temprano en la tarde</b>. El viernes es de llegada '+
+    'y algo social; el domingo y el lunes las tardes quedan libres. '+
     'Bonus: con ese boleto <b>ZooAmerica es gratis</b> entrando desde adentro del parque.',
   noteHours:'<b>Horarios:</b> los marcados <span style="color:#67c07a">✓ confirmado</span> los saqué del sitio '+
     'oficial del lugar. Los <span style="color:#f0916f">⚠ confirmar</span> son estimados — llamen o revisen '+
@@ -323,7 +325,7 @@ const UI_ES = {
   recommended:"RECOMENDADO", free:"GRATIS",
   linkMaps:"⭐ Maps + reviews", linkDir:"🧭 Cómo llegar", linkSite:"Web",
   photo:"foto", photos:"fotos", swipe:"desliza →",
-  popupStart:"Punto de partida", popupHappy:"Happy Hours: 5pm → cierre",
+  popupStart:"Punto de partida", popupHappy:"Happy Hours: sábado 5pm → cierre",
   popupReviews:"Reviews y horario →", popupDir:"Cómo llegar →",
   footNote:'Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap · '+
     'mapa &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · '+
@@ -336,7 +338,7 @@ const UI_ES = {
     'ni a ninguno de los lugares listados. Verifiquen horarios y precios antes de salir.',
   langLabel:"Idioma / Language",
   agendaTitle:"Agenda sugerida",
-  agendaSub:"Un plan por día, armado alrededor del Happy Hours ticket. Nada de esto está reservado — cambien lo que quieran.",
+  agendaSub:"Un plan por día: viernes de llegada, el sábado gira alrededor del Happy Hours ticket y el lunes termina de regreso a Newark. Nada de esto está reservado — cambien lo que quieran.",
   agendaPark:"🎢 Hersheypark — Happy Hours (5pm → cierre)",
   agendaOpt:"opcional",
   planTitle:"Arma tu propia agenda",
@@ -559,6 +561,9 @@ function renderAgenda(){
 }
 
 /* ---------- build-your-own agenda ---------- */
+/* the Happy Hours ticket is Saturday only, so that is the one day with a
+   fixed 5pm anchor; the other three evenings are the family's to spend */
+const PARK_DAY = AGENDA.days.findIndex(d => d.slots.some(s => s.park));
 const PLAN_KEY = "laborday.plan";
 let myPlan = [[],[],[],[]];
 
@@ -625,7 +630,7 @@ function renderMyPlan(){
        ${day.length
           ? day.map((s,i)=>planRowHTML(s,d,i,day.length)).join('')
           : `<div class="agempty">${T().planEmpty}</div>`}
-       ${day.length ? `<div class="aslot park"><div class="at">5pm</div>
+       ${day.length && d === PARK_DAY ? `<div class="aslot park"><div class="at">5pm</div>
                         <div class="an">${T().agendaPark}</div></div>` : ''}
      </div>`).join('');
 
