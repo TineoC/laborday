@@ -1,9 +1,33 @@
 #!/usr/bin/env python3
 """Render the Hershey weekend page with the enriched dataset inlined."""
 import json
+import re
 
 places = json.load(open("tools/places_final.json"))
 DATA = json.dumps(places, ensure_ascii=False, separators=(",", ":"))
+
+i18n = json.load(open("tools/i18n_en.json"))
+i18n.pop("_comment", None)
+I18N = json.dumps(i18n, ensure_ascii=False, separators=(",", ":"))
+
+missing = [p["n"] for p in places if p["n"] not in i18n["places"]]
+if missing:
+    raise SystemExit("no English copy for: " + ", ".join(missing))
+
+# Spanish copy that would leak untranslated into the English page.
+# Bare clock strings ("9am–5pm") and dashes are language-neutral and need no entry.
+CLOCK = re.compile(r"^[\d:apm–\-— ]*$", re.I)
+leaks = sorted(
+    {
+        s
+        for p in places
+        for s in p["sched"]
+        if s not in i18n["sched"] and not CLOCK.match(s)
+    }
+    | {p["imgsrc"] for p in places if p["imgsrc"] and p["imgsrc"] not in i18n["imgsrc"]}
+)
+if leaks:
+    raise SystemExit("no English for: " + " | ".join(leaks))
 
 HTML = r"""<!DOCTYPE html>
 <html lang="es">
@@ -26,6 +50,11 @@ body{margin:0;background:var(--bg);color:var(--ink);
 header{background:linear-gradient(160deg,#3a1f10,#140f0d);border-bottom:1px solid var(--line);padding:26px 0 20px}
 h1{margin:0 0 6px;font-size:clamp(22px,5vw,32px);letter-spacing:-.6px}
 .dates{color:var(--gold);font-weight:600;font-size:15px}
+.langbar{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-bottom:10px;font-size:12px}
+.langbar span{color:var(--dim)}
+.langbar button{background:var(--card);color:var(--dim);border:1px solid var(--line);
+  padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer}
+.langbar button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold);font-weight:700}
 .origin{color:var(--dim);font-size:13px;margin-top:5px}
 
 .note{background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--gold);
@@ -127,33 +156,29 @@ footer a{color:var(--gold)}
 <body>
 
 <header><div class="wrap">
-  <h1>🍫 Hershey — Fin de Semana de Labor Day</h1>
-  <div class="dates">Vie 4 · Sáb 5 · Dom 6 · Lun 7 de septiembre 2026</div>
-  <div class="origin">Todas las distancias y tiempos son manejando desde la entrada de Hersheypark</div>
+  <div class="langbar"><span id="langlabel"></span>
+    <button data-l="es">Español</button><button data-l="en">English</button>
+  </div>
+  <h1 id="t-h1">🍫 Hershey — Fin de Semana de Labor Day</h1>
+  <div class="dates" id="t-dates">Vie 4 · Sáb 5 · Dom 6 · Lun 7 de septiembre 2026</div>
+  <div class="origin" id="t-origin">Todas las distancias y tiempos son manejando desde la entrada de Hersheypark</div>
 </div></header>
 
 <div class="wrap">
 
-  <div class="note">
+  <div class="note" id="t-note1">
     <b>⏰ Happy Hours Ticket:</b> entra al parque de <b>5:00 pm al cierre</b>.
     Las tardes-noches ya están tomadas — todo esto va <b>en la mañana o temprano en la tarde</b>.
     Bonus: con ese boleto <b>ZooAmerica es gratis</b> entrando desde adentro del parque.
   </div>
 
-  <div class="note warn">
+  <div class="note warn" id="t-note2">
     <b>Horarios:</b> los marcados <span style="color:#67c07a">✓ confirmado</span> los saqué del sitio oficial
     del lugar. Los <span style="color:#f0916f">⚠ confirmar</span> son estimados — llamen o revisen Google Maps.
     <b>⭐ Las estrellas son de referencia</b>; el botón "Maps + reviews" abre Google Maps con las reales.
   </div>
 
-  <div class="quick">
-    <span>Vistas rápidas:</span>
-    <a href="?cat=recomendados">⭐ Recomendados</a>
-    <a href="?evento=1">🎉 Con evento ese finde</a>
-    <a href="?orden=gratis">💵 Gratis primero</a>
-    <a href="?cat=miradores">🏔️ Miradores</a>
-    <a href="?dia=lun">🇺🇸 Abierto el lunes</a>
-  </div>
+  <div class="quick" id="quick"></div>
 
   <div id="map"></div>
 
@@ -162,20 +187,20 @@ footer a{color:var(--gold)}
   <div id="cards"></div>
 
   <footer>
-    <div class="fnote">
+    <div class="fnote" id="t-fnote">
       Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap ·
       mapa &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> ·
       horarios y eventos del sitio oficial de cada lugar · estrellas de Google Maps (referencia).
       Fotos del sitio oficial de cada lugar o de Wikimedia/Wikipedia — desliza sobre la imagen para ver más.
     </div>
     <div class="flinks">
-      <a href="https://github.com/TineoC/laborday" target="_blank" rel="noopener">Código en GitHub</a>
-      <a href="https://github.com/TineoC/laborday/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Cómo contribuir</a>
+      <a href="https://github.com/TineoC/laborday" target="_blank" rel="noopener" id="t-fcode">Código en GitHub</a>
+      <a href="https://github.com/TineoC/laborday/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" id="t-fcontrib">Cómo contribuir</a>
       <a href="https://github.com/TineoC/laborday/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>
       <a href="https://github.com/TineoC/laborday/blob/main/.github/CODEOWNERS" target="_blank" rel="noopener">CODEOWNERS</a>
-      <a href="https://github.com/TineoC/laborday/issues/new" target="_blank" rel="noopener">Reportar un dato incorrecto</a>
+      <a href="https://github.com/TineoC/laborday/issues/new" target="_blank" rel="noopener" id="t-fissue">Reportar un dato incorrecto</a>
     </div>
-    <div class="copy">
+    <div class="copy" id="t-fcopy">
       &copy; 2026 Christopher Tineo. Publicado bajo
       <a href="https://github.com/TineoC/laborday/blob/main/LICENSE" target="_blank" rel="noopener">licencia MIT</a>.
       Guía informativa hecha para un viaje familiar — no está afiliada a Hersheypark,
@@ -188,8 +213,68 @@ footer a{color:var(--gold)}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const PLACES = __DATA__;
-const DAYS = ["Vie","Sáb","Dom","Lun"];
+const I18N = __I18N__;
+const DAYS_ES = ["Vie","Sáb","Dom","Lun"];
 const CATS = ["Todos","⭐ Recomendados","Miradores","Parques","Conocer","Agua & Aventura","Eventos","Cervezas"];
+
+/* ---------- language ---------- */
+const UI_ES = {
+  htmlLang:"es",
+  title:"Hershey — Labor Day Weekend 2026",
+  h1:"🍫 Hershey — Fin de Semana de Labor Day",
+  dates:"Vie 4 · Sáb 5 · Dom 6 · Lun 7 de septiembre 2026",
+  origin:"Todas las distancias y tiempos son manejando desde la entrada de Hersheypark",
+  noteTicket:'<b>⏰ Happy Hours Ticket:</b> entra al parque de <b>5:00 pm al cierre</b>. '+
+    'Las tardes-noches ya están tomadas — todo esto va <b>en la mañana o temprano en la tarde</b>. '+
+    'Bonus: con ese boleto <b>ZooAmerica es gratis</b> entrando desde adentro del parque.',
+  noteHours:'<b>Horarios:</b> los marcados <span style="color:#67c07a">✓ confirmado</span> los saqué del sitio '+
+    'oficial del lugar. Los <span style="color:#f0916f">⚠ confirmar</span> son estimados — llamen o revisen '+
+    'Google Maps. <b>⭐ Las estrellas son de referencia</b>; el botón "Maps + reviews" abre Google Maps con las reales.',
+  quickLabel:"Vistas rápidas:",
+  quickRec:"⭐ Recomendados", quickEvent:"🎉 Con evento ese finde", quickFree:"💵 Gratis primero",
+  quickLookouts:"🏔️ Miradores", quickMonday:"🇺🇸 Abierto el lunes",
+  anyDay:"Cualquier día", onlyEvents:"🎉 Solo con evento",
+  share:"🔗 Copiar link de esta vista", shareOk:"✓ Link copiado",
+  sortMi:"Más cerca primero", sortStars:"Mejor calificado", sortFree:"Gratis primero",
+  countPlaces:"lugares", countFree:"gratis", countEvents:"con evento ese finde",
+  distance:"Distancia", price:"Precio", driving:"min manejando",
+  schedHead:"Horario del fin de semana", verOk:"✓ confirmado", verChk:"⚠ confirmar",
+  recommended:"RECOMENDADO", free:"GRATIS",
+  linkMaps:"⭐ Maps + reviews", linkDir:"🧭 Cómo llegar", linkSite:"Web",
+  photo:"foto", photos:"fotos", swipe:"desliza →",
+  popupStart:"Punto de partida", popupHappy:"Happy Hours: 5pm → cierre",
+  popupReviews:"Reviews y horario →", popupDir:"Cómo llegar →",
+  footNote:'Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap · '+
+    'mapa &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · '+
+    'horarios y eventos del sitio oficial de cada lugar · estrellas de Google Maps (referencia). '+
+    'Fotos del sitio oficial de cada lugar o de Wikimedia/Wikipedia — desliza sobre la imagen para ver más.',
+  footCode:"Código en GitHub", footContrib:"Cómo contribuir", footIssue:"Reportar un dato incorrecto",
+  footCopy:'&copy; 2026 Christopher Tineo. Publicado bajo '+
+    '<a href="https://github.com/TineoC/laborday/blob/main/LICENSE" target="_blank" rel="noopener">licencia MIT</a>. '+
+    'Guía informativa hecha para un viaje familiar — no está afiliada a Hersheypark, The Hershey Company '+
+    'ni a ninguno de los lugares listados. Verifiquen horarios y precios antes de salir.',
+  langLabel:"Idioma / Language"
+};
+
+/* system default: first browser language that is en or es, else es */
+function systemLang(){
+  const prefs = navigator.languages && navigator.languages.length
+    ? navigator.languages : [navigator.language || "es"];
+  for(const l of prefs){
+    const two = String(l).slice(0,2).toLowerCase();
+    if(two === "en" || two === "es") return two;
+  }
+  return "es";
+}
+let LANG = systemLang(), langExplicit = false;
+
+const T   = () => LANG === "en" ? I18N.ui : UI_ES;
+const DAYS = () => LANG === "en" ? I18N.days : DAYS_ES;
+const catLabel = c => LANG === "en" ? (I18N.cats[c] || c) : c;
+/* place field with English override; falls back to the Spanish original */
+const tp  = (p,k) => (LANG === "en" && I18N.places[p.n] && I18N.places[p.n][k]) || p[k];
+const tsched  = s => LANG === "en" ? (I18N.sched[s]  || s) : s;
+const timgsrc = s => LANG === "en" ? (I18N.imgsrc[s] || s) : s;
 const COLOR = {"Miradores":"#f0a83a","Parques":"#67c07a","Conocer":"#c98ae0",
                "Agua & Aventura":"#5eb3e4","Eventos":"#ef7d5a","Cervezas":"#d99a4e"};
 const EMOJI = {"Miradores":"🏔️","Parques":"🌳","Conocer":"🏛️",
@@ -208,37 +293,43 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   {attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
    maxZoom:19}).addTo(map);
 
-L.circleMarker(HP,{radius:11,color:"#fff",weight:3,fillColor:"#e0483a",fillOpacity:1})
- .addTo(map).bindPopup("<b>🎢 Hersheypark</b><br>Punto de partida<br>Happy Hours: 5pm → cierre");
+const hpMarker = L.circleMarker(HP,{radius:11,color:"#fff",weight:3,fillColor:"#e0483a",fillOpacity:1})
+ .addTo(map).bindPopup("");
+
+const popupHTML = p =>
+  `<b>${esc(p.n)}</b>${p.rec?' ⭐':''}<br>${esc(tp(p,'town'))}<br>
+   ⭐ ${p.stars} Google · <b>${p.mi} mi · ${p.min} min</b><br>
+   💵 ${esc(tp(p,'price'))}<br>
+   <a href="${gmaps(p)}" target="_blank" rel="noopener">${T().popupReviews}</a> ·
+   <a href="${gdir(p)}" target="_blank" rel="noopener">${T().popupDir}</a>`;
 
 const markers = PLACES.map(p => {
   const m = L.circleMarker([p.lat,p.lng],{
     radius: p.rec ? 10 : 7, color:"#140f0d", weight:2,
     fillColor: COLOR[p.cat] || "#f0a83a", fillOpacity:.95
-  }).bindPopup(
-    `<b>${esc(p.n)}</b>${p.rec?' ⭐':''}<br>${esc(p.town)}<br>
-     ⭐ ${p.stars} Google · <b>${p.mi} mi · ${p.min} min</b><br>
-     💵 ${esc(p.price)}<br>
-     <a href="${gmaps(p)}" target="_blank" rel="noopener">Reviews y horario →</a> ·
-     <a href="${gdir(p)}" target="_blank" rel="noopener">Cómo llegar →</a>`
-  );
+  }).bindPopup("");
   m.__p = p;
   return m.addTo(map);
 });
+
+function refreshPopups(){
+  hpMarker.setPopupContent(`<b>🎢 Hersheypark</b><br>${T().popupStart}<br>${T().popupHappy}`);
+  markers.forEach(m => m.setPopupContent(popupHTML(m.__p)));
+}
 map.fitBounds(L.featureGroup(markers).getBounds().pad(0.12));
 
 /* ---------- cards ---------- */
 function cardHTML(p){
   const gal = (p.imgs && p.imgs.length)
     ? `<div class="gal">${p.imgs.map((u,i)=>
-         `<img src="${u}" alt="${esc(p.n)} — foto ${i+1}" loading="lazy" decoding="async"
+         `<img src="${u}" alt="${esc(p.n)} — ${T().photo} ${i+1}" loading="lazy" decoding="async"
                onerror="this.remove()">`).join('')}</div>
-       ${p.imgs.length>1?`<div class="galn">1 / ${p.imgs.length} · desliza →</div>`:''}`
+       ${p.imgs.length>1?`<div class="galn">1 / ${p.imgs.length} · ${T().swipe}</div>`:''}`
     : `<div class="noimg" style="background:linear-gradient(140deg,${COLOR[p.cat]}33,#2a1e19)">${EMOJI[p.cat]||'📍'}</div>`;
   const sched = p.sched.map((s,i)=>{
     const off = /^(—|Cerrad|No abre|Solo el parque)/i.test(s);
     return `<tr class="${off?'off':''}${i===3?' lastday':''}">
-              <th>${DAYS[i]} ${4+i}</th><td>${esc(s)}</td></tr>`;
+              <th>${DAYS()[i]} ${4+i}</th><td>${esc(tsched(s))}</td></tr>`;
   }).join('');
   return `
   <div class="card">
@@ -246,31 +337,31 @@ function cardHTML(p){
       ${gal}
       <div class="badges">
         <span class="pill stars">⭐ ${p.stars}</span>
-        ${p.rec ? '<span class="pill rec">RECOMENDADO</span>'
-                : (isFree(p) ? '<span class="pill free">GRATIS</span>' : '')}
+        ${p.rec ? `<span class="pill rec">${T().recommended}</span>`
+                : (isFree(p) ? `<span class="pill free">${T().free}</span>` : '')}
       </div>
     </div>
     <div class="body">
       <h3>${esc(p.n)}</h3>
-      <div class="town">${EMOJI[p.cat]||''} ${esc(p.town)}</div>
-      ${p.event?`<div class="event">${esc(p.event)}</div>`:''}
+      <div class="town">${EMOJI[p.cat]||''} ${esc(tp(p,'town'))}</div>
+      ${p.event?`<div class="event">${esc(tp(p,'event'))}</div>`:''}
       <dl class="facts">
-        <dt>Distancia</dt><dd><b>${p.mi} mi</b> · ${p.min} min manejando</dd>
-        <dt>Precio</dt><dd class="price">${esc(p.price)}</dd>
+        <dt>${T().distance}</dt><dd><b>${p.mi} mi</b> · ${p.min} ${T().driving}</dd>
+        <dt>${T().price}</dt><dd class="price">${esc(tp(p,'price'))}</dd>
       </dl>
       <div class="schedhead">
-        Horario del fin de semana
-        <span class="vb ${p.ver?'ok':'chk'}">${p.ver?'✓ confirmado':'⚠ confirmar'}</span>
+        ${T().schedHead}
+        <span class="vb ${p.ver?'ok':'chk'}">${p.ver?T().verOk:T().verChk}</span>
       </div>
       <table class="sched">${sched}</table>
-      <p class="why">${esc(p.why)}</p>
-      <div class="tip">💡 ${esc(p.tip)}</div>
+      <p class="why">${esc(tp(p,'why'))}</p>
+      <div class="tip">💡 ${esc(tp(p,'tip'))}</div>
       <div class="links">
-        <a class="primary" href="${gmaps(p)}" target="_blank" rel="noopener">⭐ Maps + reviews</a>
-        <a href="${gdir(p)}" target="_blank" rel="noopener">🧭 Cómo llegar</a>
-        ${p.site?`<a href="${p.site}" target="_blank" rel="noopener">Web</a>`:''}
+        <a class="primary" href="${gmaps(p)}" target="_blank" rel="noopener">${T().linkMaps}</a>
+        <a href="${gdir(p)}" target="_blank" rel="noopener">${T().linkDir}</a>
+        ${p.site?`<a href="${p.site}" target="_blank" rel="noopener">${T().linkSite}</a>`:''}
       </div>
-      ${p.imgsrc?`<div class="credit">${p.imgs.length} foto${p.imgs.length>1?'s':''} · ${esc(p.imgsrc)}</div>`:''}
+      ${p.imgsrc?`<div class="credit">${p.imgs.length} ${p.imgs.length>1?T().photos:T().photo} · ${esc(timgsrc(p.imgsrc))}</div>`:''}
     </div>
   </div>`;
 }
@@ -288,6 +379,8 @@ const UNSORT = Object.fromEntries(Object.entries(SORTSLUG).map(([k,v])=>[v,k]));
 
 function readURL(){
   const q = new URLSearchParams(location.search);
+  const l = (q.get("lang")||"").slice(0,2).toLowerCase();
+  if(l === "en" || l === "es"){ LANG = l; langExplicit = true; }
   const c = (q.get("cat")||"").toLowerCase();
   if(UNSLUG[c]) curCat = UNSLUG[c];
   const d = DAYSLUG.indexOf((q.get("dia")||"").toLowerCase());
@@ -299,6 +392,7 @@ function readURL(){
 
 function writeURL(){
   const q = new URLSearchParams();
+  if(langExplicit)        q.set("lang", LANG);
   if(curCat !== "Todos")  q.set("cat", SLUG[curCat]);
   if(curDay >= 0)         q.set("dia", DAYSLUG[curDay]);
   if(curSort !== "mi")    q.set("orden", SORTSLUG[curSort]);
@@ -327,7 +421,8 @@ function render(){
   if(curSort==="free")   list.sort((a,b)=>(isFree(b)-isFree(a)) || a.mi-b.mi);
 
   document.getElementById('count').textContent =
-    `${list.length} lugares · ${list.filter(isFree).length} gratis · ${list.filter(p=>p.event).length} con evento ese finde`;
+    `${list.length} ${T().countPlaces} · ${list.filter(isFree).length} ${T().countFree} · ` +
+    `${list.filter(p=>p.event).length} ${T().countEvents}`;
   document.getElementById('cards').innerHTML =
     `<div class="grid">${list.map(cardHTML).join('')}</div>`;
   writeURL();
@@ -336,20 +431,84 @@ function render(){
   markers.forEach(m => keep.has(m.__p.n) ? m.addTo(map) : map.removeLayer(m));
 }
 
-document.getElementById('bar').innerHTML =
-  CATS.map(c=>`<button data-c="${c}">${c}</button>`).join('') +
-  `<span class="spacer"></span>
-   <select id="dsel">
-     <option value="-1">Cualquier día</option>
-     ${DAYS.map((d,i)=>`<option value="${i}">${d} ${4+i} sept</option>`).join('')}
-   </select>
-   <button id="evb" class="evtoggle">🎉 Solo con evento</button>
-   <button id="share" class="sharebtn">🔗 Copiar link de esta vista</button>
-   <select id="ssel">
-     <option value="mi">Más cerca primero</option>
-     <option value="stars">Mejor calificado</option>
-     <option value="free">Gratis primero</option>
-   </select>`;
+function buildBar(){
+  const mon = LANG === "en" ? "Sep" : "sept";
+  document.getElementById('bar').innerHTML =
+    CATS.map(c=>`<button data-c="${c}">${catLabel(c)}</button>`).join('') +
+    `<span class="spacer"></span>
+     <select id="dsel">
+       <option value="-1">${T().anyDay}</option>
+       ${DAYS().map((d,i)=>`<option value="${i}">${d} ${4+i} ${mon}</option>`).join('')}
+     </select>
+     <button id="evb" class="evtoggle">${T().onlyEvents}</button>
+     <button id="share" class="sharebtn">${T().share}</button>
+     <select id="ssel">
+       <option value="mi">${T().sortMi}</option>
+       <option value="stars">${T().sortStars}</option>
+       <option value="free">${T().sortFree}</option>
+     </select>`;
+
+  document.getElementById('evb').onclick = e => {
+    onlyEvents = !onlyEvents;
+    e.target.classList.toggle('on', onlyEvents);
+    render();
+  };
+  document.getElementById('dsel').onchange = e => { curDay = +e.target.value; render(); };
+  document.getElementById('ssel').onchange = e => { curSort = e.target.value; render(); };
+  document.getElementById('share').onclick = async e => {
+    const btn = e.currentTarget;
+    try{
+      await navigator.clipboard.writeText(location.href);
+      btn.textContent = T().shareOk;
+    }catch{
+      btn.textContent = location.href;
+    }
+    setTimeout(()=>{ btn.textContent = T().share; }, 2200);
+  };
+}
+
+/* quick views keep the current language in the link */
+function buildQuick(){
+  const qp = extra => "?" + (langExplicit ? "lang=" + LANG + "&" : "") + extra;
+  document.getElementById('quick').innerHTML =
+    `<span>${T().quickLabel}</span>
+     <a href="${qp("cat=recomendados")}">${T().quickRec}</a>
+     <a href="${qp("evento=1")}">${T().quickEvent}</a>
+     <a href="${qp("orden=gratis")}">${T().quickFree}</a>
+     <a href="${qp("cat=miradores")}">${T().quickLookouts}</a>
+     <a href="${qp("dia=lun")}">${T().quickMonday}</a>`;
+}
+
+function applyLang(){
+  const t = T();
+  document.documentElement.lang = t.htmlLang;
+  document.title = t.title;
+  document.getElementById('t-h1').textContent      = t.h1;
+  document.getElementById('t-dates').textContent   = t.dates;
+  document.getElementById('t-origin').textContent  = t.origin;
+  document.getElementById('t-note1').innerHTML     = t.noteTicket;
+  document.getElementById('t-note2').innerHTML     = t.noteHours;
+  document.getElementById('t-fnote').innerHTML     = t.footNote;
+  document.getElementById('t-fcopy').innerHTML     = t.footCopy;
+  document.getElementById('t-fcode').textContent   = t.footCode;
+  document.getElementById('t-fcontrib').textContent= t.footContrib;
+  document.getElementById('t-fissue').textContent  = t.footIssue;
+  document.getElementById('langlabel').textContent = t.langLabel;
+  document.querySelectorAll('.langbar button').forEach(b =>
+    b.classList.toggle('on', b.dataset.l === LANG));
+  buildQuick();
+  buildBar();
+  refreshPopups();
+  syncControls();
+}
+
+document.querySelector('.langbar').addEventListener('click', e => {
+  if(e.target.tagName !== 'BUTTON') return;
+  LANG = e.target.dataset.l;
+  langExplicit = true;
+  applyLang();
+  render();
+});
 
 document.getElementById('bar').addEventListener('click', e=>{
   if(e.target.tagName!=='BUTTON' || !e.target.dataset.c) return;
@@ -358,31 +517,11 @@ document.getElementById('bar').addEventListener('click', e=>{
   curCat = e.target.dataset.c;
   render();
 });
-document.getElementById('evb').onclick = e => {
-  onlyEvents = !onlyEvents;
-  e.target.classList.toggle('on', onlyEvents);
-  render();
-};
-document.getElementById('dsel').onchange = e => { curDay = +e.target.value; render(); };
-document.getElementById('ssel').onchange = e => { curSort = e.target.value; render(); };
-
 readURL();
-syncControls();
+applyLang();
 render();
 
-addEventListener('popstate', () => { readURL(); syncControls(); render(); });
-
-// "copiar link de esta vista" button
-document.getElementById('share').onclick = async e => {
-  const btn = e.currentTarget;
-  try{
-    await navigator.clipboard.writeText(location.href);
-    btn.textContent = '✓ Link copiado';
-  }catch{
-    btn.textContent = location.href;
-  }
-  setTimeout(()=>{ btn.textContent = '🔗 Copiar link de esta vista'; }, 2200);
-};
+addEventListener('popstate', () => { readURL(); applyLang(); render(); });
 
 setTimeout(()=>map.invalidateSize(),150);
 </script>
@@ -390,7 +529,7 @@ setTimeout(()=>map.invalidateSize(),150);
 </html>
 """
 
-out = HTML.replace("__DATA__", DATA)
+out = HTML.replace("__DATA__", DATA).replace("__I18N__", I18N)
 open("index.html", "w").write(out)
 print("wrote page:", len(out), "bytes,", len(places), "places")
 print("free:", sum(1 for p in places if "GRATIS" in p["price"]))

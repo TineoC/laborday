@@ -18,6 +18,7 @@ index.html                  generated output; never edit directly
 CNAME                       custom domain for GitHub Pages
 tools/places_seed.json      the 32 places: name, category, coords, price, copy
 tools/places_final.json     enriched dataset the page is built from
+tools/i18n_en.json          English translation of the UI and of every place
 tools/img_harvest.json      photo URLs per place
 tools/build_page.py         renders places_final.json -> index.html
 tools/enrich_distances.py   OSRM driving distance/time from Hersheypark
@@ -50,8 +51,16 @@ category emoji, which is fine.
 **No new dependencies.** Leaflet from CDN is the only runtime dependency and it
 stays that way. No build step, no bundler, no framework.
 
-**Page copy is informal Spanish.** Place names stay in English as they appear on
-Google Maps. Do not translate the UI to English.
+**Page copy is informal Spanish, and Spanish is the source of truth.** Place
+names stay in English as they appear on Google Maps.
+
+**The page is bilingual (es/en).** English lives in `tools/i18n_en.json` and is
+a *translation layer only* — never put a fact there that is not already in the
+Spanish copy. `build_page.py` refuses to build if a place, a schedule phrase or
+a photo credit has no English entry. The language is picked from
+`navigator.languages` (first entry that is `en` or `es`, otherwise Spanish), and
+can be forced with `?lang=en` / `?lang=es` or the toggle in the header. Once
+forced, `lang` rides along in every shareable URL.
 
 ## Data sources that work
 
