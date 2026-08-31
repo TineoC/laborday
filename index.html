@@ -335,6 +335,56 @@ function cardHTML(p){
   </div>`;
 }
 
+/* ---------- photo galleries advance on their own every 3s ---------- */
+const GAL_MS = 3000;
+const GAL_HOLD = 8000;          /* pause after the visitor touches a gallery */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+/* live count, not p.imgs.length — broken images remove themselves onerror */
+const galIndex = g => g.clientWidth ? Math.round(g.scrollLeft / g.clientWidth) : 0;
+
+function updateCounter(g){
+  const c = g.parentElement.querySelector('.galn');
+  if(!c) return;
+  const n = g.children.length;
+  if(n < 2){ c.remove(); return; }
+  c.textContent = `${galIndex(g)+1} / ${n} · ${T().swipe}`;
+}
+
+function advance(g){
+  const n = g.children.length;
+  if(n < 2 || !g.clientWidth) return;
+  g.scrollTo({left: ((galIndex(g)+1) % n) * g.clientWidth, behavior:"smooth"});
+}
+
+const onScreen = el => {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < innerHeight;
+};
+
+let galTimer = null;
+function initGalleries(){
+  document.querySelectorAll('.gal').forEach(g => {
+    updateCounter(g);
+    g.addEventListener('scroll', () => {
+      clearTimeout(g.__t);
+      g.__t = setTimeout(() => updateCounter(g), 120);
+    }, {passive:true});
+    /* someone swiping or hovering is reading this card — back off, then resume */
+    ['pointerenter','pointerdown','touchstart'].forEach(ev =>
+      g.addEventListener(ev, () => { g.__hold = Date.now() + GAL_HOLD; }, {passive:true}));
+  });
+  /* auto-advance is movement; leave it off when the visitor asked for less of it */
+  if(galTimer || reduceMotion.matches) return;
+  galTimer = setInterval(() => {
+    if(document.hidden) return;
+    const now = Date.now();
+    document.querySelectorAll('.gal').forEach(g => {
+      if(!(g.__hold > now) && onScreen(g)) advance(g);
+    });
+  }, GAL_MS);
+}
+
 let curCat = "Todos", curSort = "mi", curDay = -1, onlyEvents = false;
 
 /* --- shareable URLs: ?cat=recomendados&dia=sab&orden=estrellas&evento=1 --- */
@@ -394,6 +444,7 @@ function render(){
     `${list.filter(p=>p.event).length} ${T().countEvents}`;
   document.getElementById('cards').innerHTML =
     `<div class="grid">${list.map(cardHTML).join('')}</div>`;
+  initGalleries();
   writeURL();
 
   const keep = new Set(list.map(p=>p.n));
