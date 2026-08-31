@@ -95,7 +95,14 @@ table.sched tr.lastday th::after{content:" 🇺🇸";font-size:9px}
 
 h2.sec{font-size:14px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
   margin:26px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
-footer{color:var(--dim);font-size:12.5px;padding:24px 0 50px;border-top:1px solid var(--line);margin-top:20px}
+footer{color:var(--dim);font-size:12.5px;padding:22px 0 50px;border-top:1px solid var(--line);margin-top:20px}
+.fnote{margin-bottom:12px;line-height:1.6}
+.flinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.flinks a{color:var(--gold);text-decoration:none;font-size:12.5px;padding:5px 11px;
+  border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.flinks a:hover{border-color:var(--gold)}
+.copy{font-size:12px;line-height:1.6;color:#8b776c}
+footer a{color:var(--gold)}
 .leaflet-popup-content-wrapper{background:#241916;color:#f6efe9;border-radius:10px}
 .leaflet-popup-tip{background:#241916}
 .leaflet-popup-content{margin:11px 13px;font:13.5px/1.45 -apple-system,sans-serif}
@@ -132,9 +139,26 @@ footer{color:var(--dim);font-size:12.5px;padding:24px 0 50px;border-top:1px soli
   <div id="cards"></div>
 
   <footer>
-    Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap · mapa © OpenStreetMap/CARTO ·
-    fotos de Wikimedia Commons (crédito en cada tarjeta) · estrellas de Google Maps (referencia).
-    Fotos tomadas del sitio oficial de cada lugar o de Wikimedia/Wikipedia — desliza sobre la imagen para ver más.
+    <div class="fnote">
+      Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap ·
+      mapa &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> ·
+      horarios y eventos del sitio oficial de cada lugar · estrellas de Google Maps (referencia).
+      Fotos del sitio oficial de cada lugar o de Wikimedia/Wikipedia — desliza sobre la imagen para ver más.
+    </div>
+    <div class="flinks">
+      <a href="https://github.com/TineoC/laborday" target="_blank" rel="noopener">Código en GitHub</a>
+      <a href="https://github.com/TineoC/laborday/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Cómo contribuir</a>
+      <a href="https://github.com/TineoC/laborday/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>
+      <a href="https://github.com/TineoC/laborday/blob/main/.github/CODEOWNERS" target="_blank" rel="noopener">CODEOWNERS</a>
+      <a href="https://github.com/TineoC/laborday/issues/new" target="_blank" rel="noopener">Reportar un dato incorrecto</a>
+    </div>
+    <div class="copy">
+      &copy; 2026 Christopher Tineo. Publicado bajo
+      <a href="https://github.com/TineoC/laborday/blob/main/LICENSE" target="_blank" rel="noopener">licencia MIT</a>.
+      Guía informativa hecha para un viaje familiar — no está afiliada a Hersheypark,
+      The Hershey Company ni a ninguno de los lugares listados.
+      Verifiquen horarios y precios antes de salir.
+    </div>
   </footer>
 </div>
 

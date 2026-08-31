@@ -1,0 +1,17 @@
+# Code owners for this repository.
+# These owners are requested for review automatically on every pull request.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+*                   @TineoC
+
+# The page itself and the data baked into it
+/index.html         @TineoC
+
+# Data pipeline
+/tools/             @TineoC
+
+# Repo policy and agent instructions
+/AGENTS.md          @TineoC
+/CONTRIBUTING.md    @TineoC
+/.github/           @TineoC
