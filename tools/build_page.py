@@ -42,9 +42,16 @@ h1{margin:0 0 6px;font-size:clamp(22px,5vw,32px);letter-spacing:-.6px}
   padding:7px 13px;border-radius:99px;font-size:14px;cursor:pointer;white-space:nowrap}
 .bar button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold);font-weight:700}
 .bar .spacer{flex:1}
+.bar button.sharebtn{background:#2a1e19;color:var(--dim);border-style:dashed}
+.bar button.sharebtn:hover{color:var(--gold);border-color:var(--gold)}
 .bar select{background:var(--card);color:var(--ink);border:1px solid var(--line);
   border-radius:8px;padding:7px 10px;font-size:14px}
 .count{color:var(--dim);font-size:13px;padding:6px 0}
+.quick{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:14px 0 0;font-size:13px}
+.quick span{color:var(--dim)}
+.quick a{color:var(--gold);text-decoration:none;padding:5px 11px;border-radius:99px;
+  border:1px solid var(--line);background:var(--card)}
+.quick a:hover{border-color:var(--gold)}
 
 .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));margin-bottom:26px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
@@ -137,6 +144,15 @@ footer a{color:var(--gold)}
     <b>Horarios:</b> los marcados <span style="color:#67c07a">✓ confirmado</span> los saqué del sitio oficial
     del lugar. Los <span style="color:#f0916f">⚠ confirmar</span> son estimados — llamen o revisen Google Maps.
     <b>⭐ Las estrellas son de referencia</b>; el botón "Maps + reviews" abre Google Maps con las reales.
+  </div>
+
+  <div class="quick">
+    <span>Vistas rápidas:</span>
+    <a href="?cat=recomendados">⭐ Recomendados</a>
+    <a href="?evento=1">🎉 Con evento ese finde</a>
+    <a href="?orden=gratis">💵 Gratis primero</a>
+    <a href="?cat=miradores">🏔️ Miradores</a>
+    <a href="?dia=lun">🇺🇸 Abierto el lunes</a>
   </div>
 
   <div id="map"></div>
@@ -261,6 +277,44 @@ function cardHTML(p){
 
 let curCat = "Todos", curSort = "mi", curDay = -1, onlyEvents = false;
 
+/* --- shareable URLs: ?cat=recomendados&dia=sab&orden=estrellas&evento=1 --- */
+const SLUG = {"Todos":"todos","⭐ Recomendados":"recomendados","Miradores":"miradores",
+  "Parques":"parques","Conocer":"conocer","Agua & Aventura":"agua","Eventos":"eventos",
+  "Cervezas":"cervezas"};
+const UNSLUG = Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
+const DAYSLUG = ["vie","sab","dom","lun"];
+const SORTSLUG = {mi:"cerca", stars:"estrellas", free:"gratis"};
+const UNSORT = Object.fromEntries(Object.entries(SORTSLUG).map(([k,v])=>[v,k]));
+
+function readURL(){
+  const q = new URLSearchParams(location.search);
+  const c = (q.get("cat")||"").toLowerCase();
+  if(UNSLUG[c]) curCat = UNSLUG[c];
+  const d = DAYSLUG.indexOf((q.get("dia")||"").toLowerCase());
+  if(d >= 0) curDay = d;
+  const s = (q.get("orden")||"").toLowerCase();
+  if(UNSORT[s]) curSort = UNSORT[s];
+  if(q.get("evento") === "1") onlyEvents = true;
+}
+
+function writeURL(){
+  const q = new URLSearchParams();
+  if(curCat !== "Todos")  q.set("cat", SLUG[curCat]);
+  if(curDay >= 0)         q.set("dia", DAYSLUG[curDay]);
+  if(curSort !== "mi")    q.set("orden", SORTSLUG[curSort]);
+  if(onlyEvents)          q.set("evento", "1");
+  const qs = q.toString();
+  history.replaceState(null, "", qs ? location.pathname + "?" + qs : location.pathname);
+}
+
+function syncControls(){
+  document.querySelectorAll('#bar button[data-c]').forEach(b =>
+    b.classList.toggle('on', b.dataset.c === curCat));
+  document.getElementById('dsel').value = String(curDay);
+  document.getElementById('ssel').value = curSort;
+  document.getElementById('evb').classList.toggle('on', onlyEvents);
+}
+
 function render(){
   let list = PLACES.slice();
   if(curCat === "⭐ Recomendados") list = list.filter(p=>p.rec);
@@ -276,19 +330,21 @@ function render(){
     `${list.length} lugares · ${list.filter(isFree).length} gratis · ${list.filter(p=>p.event).length} con evento ese finde`;
   document.getElementById('cards').innerHTML =
     `<div class="grid">${list.map(cardHTML).join('')}</div>`;
+  writeURL();
 
   const keep = new Set(list.map(p=>p.n));
   markers.forEach(m => keep.has(m.__p.n) ? m.addTo(map) : map.removeLayer(m));
 }
 
 document.getElementById('bar').innerHTML =
-  CATS.map((c,i)=>`<button data-c="${c}" class="${i?'':'on'}">${c}</button>`).join('') +
+  CATS.map(c=>`<button data-c="${c}">${c}</button>`).join('') +
   `<span class="spacer"></span>
    <select id="dsel">
      <option value="-1">Cualquier día</option>
      ${DAYS.map((d,i)=>`<option value="${i}">${d} ${4+i} sept</option>`).join('')}
    </select>
    <button id="evb" class="evtoggle">🎉 Solo con evento</button>
+   <button id="share" class="sharebtn">🔗 Copiar link de esta vista</button>
    <select id="ssel">
      <option value="mi">Más cerca primero</option>
      <option value="stars">Mejor calificado</option>
@@ -310,7 +366,24 @@ document.getElementById('evb').onclick = e => {
 document.getElementById('dsel').onchange = e => { curDay = +e.target.value; render(); };
 document.getElementById('ssel').onchange = e => { curSort = e.target.value; render(); };
 
+readURL();
+syncControls();
 render();
+
+addEventListener('popstate', () => { readURL(); syncControls(); render(); });
+
+// "copiar link de esta vista" button
+document.getElementById('share').onclick = async e => {
+  const btn = e.currentTarget;
+  try{
+    await navigator.clipboard.writeText(location.href);
+    btn.textContent = '✓ Link copiado';
+  }catch{
+    btn.textContent = location.href;
+  }
+  setTimeout(()=>{ btn.textContent = '🔗 Copiar link de esta vista'; }, 2200);
+};
+
 setTimeout(()=>map.invalidateSize(),150);
 </script>
 </body>

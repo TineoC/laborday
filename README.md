@@ -38,3 +38,24 @@ Los precios pueden cambiar.
 
 Un solo archivo, `index.html`, sin build ni dependencias que instalar.
 Leaflet se carga desde CDN. Ábrelo directo en el navegador.
+
+## Enlaces compartibles
+
+Los filtros viven en la URL, así que cualquier vista se puede mandar por chat:
+
+| Parámetro | Valores | Ejemplo |
+|---|---|---|
+| `cat` | `recomendados`, `miradores`, `parques`, `conocer`, `agua`, `eventos`, `cervezas` | `?cat=miradores` |
+| `dia` | `vie`, `sab`, `dom`, `lun` | `?dia=lun` |
+| `orden` | `cerca`, `estrellas`, `gratis` | `?orden=gratis` |
+| `evento` | `1` | `?evento=1` |
+
+Se combinan:
+
+```
+https://laborday.tineochristopher.com/?cat=recomendados&dia=lun&orden=estrellas
+```
+
+La página trae botones de vistas rápidas arriba del mapa y un botón para copiar
+el link de la vista actual. Un parámetro inválido se ignora y cae al valor por
+defecto.
