@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hershey — Labor Day Weekend 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --bg:#140f0d; --card:#211815; --card2:#2a1e19; --ink:#f6efe9; --dim:#a89287;
+  --gold:#f0a83a; --green:#67c07a; --blue:#5eb3e4; --line:#3a2a23;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:1200px;margin:0 auto;padding:0 14px}
+
+header{background:linear-gradient(160deg,#3a1f10,#140f0d);border-bottom:1px solid var(--line);padding:26px 0 20px}
+h1{margin:0 0 6px;font-size:clamp(22px,5vw,32px);letter-spacing:-.6px}
+.dates{color:var(--gold);font-weight:600;font-size:15px}
+.origin{color:var(--dim);font-size:13px;margin-top:5px}
+
+.note{background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--gold);
+  padding:12px 14px;border-radius:10px;font-size:14px;margin:14px 0}
+.note.warn{border-left-color:#e0644a}
+
+#map{height:min(58vh,460px);border-radius:14px;margin:14px 0;border:1px solid var(--line);background:#0d0a09}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px;
+  position:sticky;top:0;z-index:500;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
+.bar button{background:var(--card);color:var(--ink);border:1px solid var(--line);
+  padding:7px 13px;border-radius:99px;font-size:14px;cursor:pointer;white-space:nowrap}
+.bar button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold);font-weight:700}
+.bar .spacer{flex:1}
+.bar select{background:var(--card);color:var(--ink);border:1px solid var(--line);
+  border-radius:8px;padding:7px 10px;font-size:14px}
+.count{color:var(--dim);font-size:13px;padding:6px 0}
+
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));margin-bottom:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:#5a4034}
+.thumb{height:150px;background-size:cover;background-position:center;position:relative;
+  background-color:#2a1e19;display:flex;align-items:center;justify-content:center;font-size:46px}
+.thumb .badges{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;gap:6px}
+.pill{background:rgba(12,8,6,.82);backdrop-filter:blur(4px);color:var(--ink);font-size:12px;
+  padding:4px 9px;border-radius:99px;font-weight:600;white-space:nowrap}
+.pill.stars{color:var(--gold)}
+.pill.rec{background:var(--gold);color:#2a1a08}
+.pill.free{background:rgba(103,192,122,.9);color:#0d2412}
+.body{padding:13px 14px 14px;display:flex;flex-direction:column;flex:1}
+.card h3{margin:0 0 2px;font-size:17px;line-height:1.25}
+.town{color:var(--dim);font-size:13px;margin-bottom:9px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px;margin-bottom:9px}
+.facts dt{color:var(--dim)}
+.facts dd{margin:0}
+.price{color:var(--green);font-weight:600}
+.why{font-size:14px;margin:0 0 8px}
+.tip{font-size:13px;background:#2f2119;border-left:2px solid var(--gold);padding:7px 10px;
+  border-radius:0 7px 7px 0;color:#e4d3c6;margin-bottom:10px}
+.days{display:flex;gap:5px;margin-bottom:11px}
+.day{font-size:11px;padding:2px 8px;border-radius:6px;background:#191210;color:#6b5a51;border:1px solid var(--line)}
+.day.hit{background:var(--gold);color:#2a1a08;font-weight:700;border-color:var(--gold)}
+.links{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+.links a{font-size:13px;text-decoration:none;padding:7px 11px;border-radius:8px;
+  background:#33231d;color:var(--gold);border:1px solid var(--line);white-space:nowrap}
+.links a.primary{background:var(--gold);color:#2a1a08;font-weight:700;border-color:var(--gold)}
+.event{background:linear-gradient(90deg,#4a2a12,#33231d);border:1px solid #6b4520;
+  color:#ffd9a0;font-size:13px;padding:9px 11px;border-radius:9px;margin-bottom:10px;line-height:1.45}
+.schedhead{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--dim);
+  margin:2px 0 6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vb{font-size:10px;letter-spacing:0;text-transform:none;padding:2px 7px;border-radius:99px;font-weight:700}
+.vb.ok{background:rgba(103,192,122,.18);color:var(--green);border:1px solid rgba(103,192,122,.4)}
+.vb.chk{background:rgba(224,100,74,.16);color:#f0916f;border:1px solid rgba(224,100,74,.4)}
+table.sched{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+table.sched th{text-align:left;font-weight:700;color:var(--gold);width:64px;padding:3px 0;vertical-align:top}
+table.sched td{padding:3px 0;color:#e8dcd3}
+table.sched tr.off th{color:#6b5a51}
+table.sched tr.off td{color:#6b5a51}
+table.sched tr.lastday th::after{content:" 🇺🇸";font-size:9px}
+.credit{font-size:10px;color:#6b5a51;margin-top:8px}
+.credit a{color:#6b5a51}
+
+h2.sec{font-size:14px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
+  margin:26px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
+footer{color:var(--dim);font-size:12.5px;padding:24px 0 50px;border-top:1px solid var(--line);margin-top:20px}
+.leaflet-popup-content-wrapper{background:#241916;color:#f6efe9;border-radius:10px}
+.leaflet-popup-tip{background:#241916}
+.leaflet-popup-content{margin:11px 13px;font:13.5px/1.45 -apple-system,sans-serif}
+.leaflet-popup-content a{color:var(--gold)}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.thumb{height:135px}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>🍫 Hershey — Fin de Semana de Labor Day</h1>
+  <div class="dates">Vie 4 · Sáb 5 · Dom 6 · Lun 7 de septiembre 2026</div>
+  <div class="origin">Todas las distancias y tiempos son manejando desde la entrada de Hersheypark</div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="note">
+    <b>⏰ Happy Hours Ticket:</b> entra al parque de <b>5:00 pm al cierre</b>.
+    Las tardes-noches ya están tomadas — todo esto va <b>en la mañana o temprano en la tarde</b>.
+    Bonus: con ese boleto <b>ZooAmerica es gratis</b> entrando desde adentro del parque.
+  </div>
+
+  <div class="note warn">
+    <b>Horarios:</b> los marcados <span style="color:#67c07a">✓ confirmado</span> los saqué del sitio oficial
+    del lugar. Los <span style="color:#f0916f">⚠ confirmar</span> son estimados — llamen o revisen Google Maps.
+    <b>⭐ Las estrellas son de referencia</b>; el botón "Maps + reviews" abre Google Maps con las reales.
+  </div>
+
+  <div id="map"></div>
+
+  <div class="bar" id="bar"></div>
+  <div class="count" id="count"></div>
+  <div id="cards"></div>
+
+  <footer>
+    Distancias y tiempos de manejo calculados con OSRM sobre datos de OpenStreetMap · mapa © OpenStreetMap/CARTO ·
+    fotos de Wikimedia Commons (crédito en cada tarjeta) · estrellas de Google Maps (referencia).
+    Los lugares sin foto libre disponible muestran ícono de color.
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const PLACES = [{"n":"Hershey's Chocolate World","cat":"Conocer","town":"Hershey (al lado del parque)","lat":40.2895,"lng":-76.6557,"stars":4.6,"nrev":"~30k","price":"GRATIS entrar y el ride · Create Your Own Bar $27 · Trolley $24","hours":"~9am–9pm","days":[1,1,1,1],"why":"El tour-ride del chocolate es GRATIS y dura 10 min — te dan chocolate al final. Tienda enorme.","tip":"Lo más barato del finde: el ride gratis. Vayan temprano, después de las 11am es un gentío.","q":"Hersheys Chocolate World Hershey PA","site":"https://www.chocolateworld.com/","mi":0.1,"min":1,"img":"https://www.chocolateworld.com/content/dam/hershey-chocolate-world/images/home/home-hero-video-still.jpg","imgname":"file:chocolate world.jpg","credit":"https://www.chocolateworld.com/","rec":true,"imgsrc":"sitio oficial","sched":["9am–9pm","9am–9pm","9am–9pm","9am–9pm"],"ver":false,"event":""},{"n":"ZooAmerica","cat":"Agua & Aventura","town":"Hershey (pegado al parque)","lat":40.291,"lng":-76.6489,"stars":4.4,"nrev":"~3.2k","price":"$16 adulto · $13 niño · GRATIS con boleto de Hersheypark","hours":"~10am–8pm","days":[1,1,1,1],"why":"Zoológico de 11 acres solo con animales de Norteamérica: osos, lobos, lince, caimanes, búhos.","tip":"Se entra GRATIS desde adentro de Hersheypark con su Happy Hours ticket. Aprovéchenlo.","q":"ZooAmerica North American Wildlife Park Hershey PA","site":"https://zooamerica.com/","mi":1.3,"min":4,"img":"https://www.zooamerica.com/assets/images/sharing/black-bear-og.jpg","imgname":"file:entrance to hersheypark zooamerica.jpg","credit":"https://zooamerica.com/","rec":false,"imgsrc":"sitio oficial","sched":["10am–7pm","10am–7pm","10am–7pm","10am–7pm"],"ver":false,"event":""},{"n":"The Hershey Story Museum","cat":"Conocer","town":"Downtown Hershey","lat":40.2856,"lng":-76.6503,"stars":4.5,"nrev":"~2.2k","price":"Museo $17 adulto / $13 niño · Chocolate Lab $22 · Cata $15","hours":"~9am–5pm","days":[1,1,1,1],"why":"Historia de Milton Hershey. El Chocolate Lab (haces tu propia barra) y la cata de chocolates de 4 países son lo mejor.","tip":"Chocolate Lab se llena — reserven online AHORA, no en la puerta.","q":"The Hershey Story Museum Hershey PA","site":"https://hersheystory.org/","mi":1.6,"min":6,"img":"https://hersheystory.org/wp-content/uploads/2022/01/lisas-cafe-homepage-callout.jpg","imgname":"file:the hershey story.jpg","credit":"https://hersheystory.org/","rec":false,"imgsrc":"sitio oficial","sched":["9am–5pm","9am–5pm","9am–5pm","9am–5pm"],"ver":true,"event":""},{"n":"YAH Brew","cat":"Cervezas","town":"Hershey","lat":40.286,"lng":-76.652,"stars":4.6,"nrev":"~250","price":"Pinta $6–8","hours":"Tarde–noche","days":[1,1,1,1],"why":"Taproom chiquito en downtown Hershey. Rápido, casual, se camina desde el centro.","tip":"Parada de 45 min, no un destino.","q":"YAH Brew Hershey PA","site":"","mi":1.6,"min":5,"img":"","imgname":"","rec":false,"sched":["3pm–10pm","12pm–10pm","12pm–8pm","12pm–8pm"],"ver":false,"event":""},{"n":"Jazz at the Barnyard","cat":"Eventos","town":"Hershey History Center","lat":40.2856,"lng":-76.648,"stars":4.7,"nrev":"~120","price":"$10–15 · niños gratis","hours":"Viernes noche (~6–9pm)","days":[1,0,0,0],"why":"Jazz en vivo al aire libre en el granero histórico. Íntimo, lleven silla plegable.","tip":"Choca con Happy Hours del parque el viernes. Decidan uno.","q":"Hershey History Center Hershey PA","site":"https://hersheyhistory.org/","mi":1.7,"min":6,"img":"https://static.wixstatic.com/media/c5a1e1_e14b26ccebd44bcfb2fa35b0a86918bd~mv2.png/v1/fill/w_1200,h_481,al_c/c5a1e1_e14b26ccebd44bcfb2fa35b0a86918bd~mv2.png","imgname":"","rec":false,"credit":"https://hersheyhistory.org/","imgsrc":"sitio oficial","sched":["Portones 6pm · música 7–9pm","—","—","—"],"ver":true,"event":"🎷 VIERNES 4: concierto de la banda Third Stream, 7–9pm. Portones y exhibición de fotos abren 6pm."},{"n":"Through the Lens of Hershey","cat":"Eventos","town":"Hershey History Center","lat":40.2856,"lng":-76.648,"stars":4.7,"nrev":"~120","price":"GRATIS / donación","hours":"Vie–Sáb ~10am–4pm","days":[1,1,0,0],"why":"Exhibición de fotografía histórica de Hershey. Corta, con aire acondicionado.","tip":"30–45 min. Perfecto para matar tiempo si llueve.","q":"Hershey History Center Hershey PA","site":"https://hersheyhistory.org/","mi":1.7,"min":6,"img":"https://static.wixstatic.com/media/c5a1e1_e14b26ccebd44bcfb2fa35b0a86918bd~mv2.png/v1/fill/w_1200,h_481,al_c/c5a1e1_e14b26ccebd44bcfb2fa35b0a86918bd~mv2.png","imgname":"","rec":false,"credit":"https://hersheyhistory.org/","imgsrc":"sitio oficial","sched":["6pm–9pm (durante el Jazz)","10am–3pm (Gallery Day)","—","—"],"ver":true,"event":"📸 Fotografía de John Martin. Vie 4 noche de preview (6–9pm, durante el Jazz) y Sáb 5 Gallery Day (10am–3pm)."},{"n":"Hershey Gardens","cat":"Conocer","town":"Hershey","lat":40.2872,"lng":-76.6462,"stars":4.6,"nrev":"~3.5k","price":"$16 adulto · $13 niño (3–12) · <3 gratis","hours":"~9am–6pm","days":[1,1,1,1],"why":"23 acres de jardines temáticos + Butterfly Atrium con cientos de mariposas volando sueltas + Children's Garden interactivo.","tip":"Vayan al atrio de mariposas primero, en la mañana están más activas. 1.5–2 h.","q":"Hershey Gardens Hershey PA","site":"https://www.hersheygardens.org/","mi":1.7,"min":6,"img":"https://static.tacdn.com/img2/travelers_choice/widgets/tchotel_2025_L.png","imgname":"file:hershey gardens.jpg","credit":"https://www.hersheygardens.org/","rec":true,"imgsrc":"sitio oficial","sched":["9am–6pm","9am–6pm","9am–6pm","9am–6pm"],"ver":true,"event":"🎨 Vie 4 a Dom 6: Hershey Area Art Association Show & Sale ('Blooming Art'), 9am–6pm. Viernes 12–12:30pm: alimentación en vivo en el Zoology Zone."},{"n":"Hidden Still Spirits","cat":"Cervezas","town":"Hershey","lat":40.2833,"lng":-76.644,"stars":4.6,"nrev":"~700","price":"Cóctel $12–14 · Flight $15 · Tour+cata $20","hours":"Tarde–noche","days":[1,1,1,1],"why":"Destilería local de whiskey, ron y vodka. Cócteles serios en bar con onda speakeasy.","tip":"Ambiente de adultos — no es el plan con niños.","q":"Hidden Still Spirits Hershey PA","site":"https://hiddenstill.com/","mi":1.9,"min":6,"img":"","imgname":"","rec":false,"sched":["11am–11pm","11am–11pm","12pm–9pm","11am–10pm"],"ver":true,"event":""},{"n":"Rotunda Brew Pub","cat":"Cervezas","town":"Hershey (Hershey Lodge)","lat":40.2795,"lng":-76.664,"stars":4.3,"nrev":"~500","price":"Pinta $8–10 · Comida $15–22","hours":"Tarde–noche","days":[1,1,1,1],"why":"Brewpub dentro del Hershey Lodge. Conveniente y cerca, precios de hotel.","tip":"El más caro por lo que da. Solo si están cansados y no quieren manejar.","q":"Rotunda Brew Pub Hershey PA","site":"","mi":2.3,"min":7,"img":"","imgname":"","rec":false,"sched":["11am–11pm","11am–11pm","11am–10pm","11am–10pm"],"ver":false,"event":""},{"n":"Tröegs Independent Brewing","cat":"Cervezas","town":"Hershey","lat":40.2778,"lng":-76.658,"stars":4.7,"nrev":"~6.5k","price":"Pinta $7–9 · Flight $12 · Comida $12–18 · Tour GRATIS","hours":"~11am–9pm","days":[1,1,1,1],"why":"La cervecería #1 del área. Nave industrial enorme, snack bar de comida buena, y un tour autoguiado GRATIS por pasillos con ventanas a la producción.","tip":"Si hacen UNA sola cervecería, esta. Kid-friendly de verdad — hay familias enteras.","q":"Troegs Independent Brewing Hershey PA","site":"https://www.troegs.com/","mi":2.4,"min":8,"img":"","imgname":"","rec":true,"sched":["11am–10pm","11am–10pm","11am–9pm","11:30am–9pm"],"ver":true,"event":"🍺 Abierto el lunes de Labor Day con horario especial (11:30am–9pm)."},{"n":"AACA Automobile Museum","cat":"Conocer","town":"Hershey","lat":40.2708,"lng":-76.6694,"stars":4.7,"nrev":"~2.6k","price":"$16 adulto · $12 niño (4–12) · <4 gratis","hours":"~9am–5pm","days":[1,1,1,1],"why":"Museo de autos clásicos de primera. Carros de los 1890s a hoy, buses, y la exhibición de Tucker. Enorme y con A/C.","tip":"El plan #1 si llueve. Fácil 2 h adentro.","q":"AACA Museum Hershey PA","site":"https://www.aacamuseum.org/","mi":3.4,"min":10,"img":"https://atexpa.org/wp-content/uploads/2025/04/AACA-AmericasTransportEx-Tag-HERSHEY.jpg","imgname":"file:1969 aaca museum amc amx tag.jpg","credit":"https://www.aacamuseum.org/","rec":false,"imgsrc":"sitio oficial","sched":["9am–5pm","9am–5pm","9am–5pm","9am–5pm"],"ver":true,"event":"🚗 SÁBADO 5: Duryea Day (show de autos antiguos, 9am–3pm) + Ollie Day (9am–5pm) + charla 'Board Tracks: Speed, Spectacle & Risk in Early Auto Racing'."},{"n":"Rubber Soul Brewing","cat":"Cervezas","town":"Hummelstown","lat":40.265,"lng":-76.708,"stars":4.6,"nrev":"~600","price":"Pinta $6–8 · Comida $12–16","hours":"Tarde–noche","days":[1,1,1,1],"why":"Brewpub chiquito con cocina propia en el downtown histórico de Hummelstown. Tema Beatles.","tip":"Combo perfecto: Indian Echo Caverns en la mañana, almuerzo aquí (5 min).","q":"Rubber Soul Brewing Hummelstown PA","site":"","mi":3.9,"min":9,"img":"https://static.wixstatic.com/media/6f2ade_4a069ec9cf9e4020b418775a8469f29e~mv2.jpg/v1/fill/w_2500,h_2000,al_c/6f2ade_4a069ec9cf9e4020b418775a8469f29e~mv2.jpg","imgname":"","rec":false,"credit":"https://www.rubbersoulbrewing.com/","imgsrc":"sitio oficial","sched":["11:30am–11pm","11:30am–11pm","12pm–9pm","11:30am–9pm"],"ver":true,"event":""},{"n":"Cocoa Kayak Rentals","cat":"Agua & Aventura","town":"Palmyra — Swatara Creek","lat":40.308,"lng":-76.596,"stars":4.7,"nrev":"~500","price":"Kayak $30–40 · Tube $20 · Canoa $45 (por viaje)","hours":"Mañanas; reserva online obligatoria","days":[1,1,1,1],"why":"Bajada tranquila por el Swatara Creek, sin rápidos. Ellos te llevan río arriba y te recogen.","tip":"Reserven YA — Labor Day se llena. Depende del nivel del agua, llamen si no llovió.","q":"Cocoa Kayak Rentals Palmyra PA","site":"https://cocoakayak.com/","mi":4.4,"min":10,"img":"","imgname":"","rec":false,"sched":["9am–5pm (con reserva)","9am–5pm (con reserva)","9am–5pm (con reserva)","9am–5pm (con reserva)"],"ver":false,"event":""},{"n":"Indian Echo Caverns","cat":"Agua & Aventura","town":"Hummelstown","lat":40.2481,"lng":-76.7043,"stars":4.6,"nrev":"~4.3k","price":"$22 adulto · $14 niño (3–11) · Gem mining $12–20","hours":"~9am–5pm, tours cada ~20 min","days":[1,1,1,1],"why":"Cueva de caliza a 52°F constantes. Tour guiado de 45 min. Afuera hay mina de gemas y animales de granja para los niños.","tip":"La opción #1 si hace calor. Lleven suéter — adentro da frío de verdad. Piso mojado y resbaloso.","q":"Indian Echo Caverns Hummelstown PA","site":"https://indianechocaverns.com/","mi":5.3,"min":11,"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/The_fins%2C_Indian_Echo_Caverns%2C_Hummelstown%2C_Pa.%2C_near_Harrisburg%2C_Pa_%2874060%29.jpg/960px-The_fins%2C_Indian_Echo_Caverns%2C_Hummelstown%2C_Pa.%2C_near_Harrisburg%2C_Pa_%2874060%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","imgname":"file:the fins, indian echo caverns, hummelstown, pa., near harrisburg, pa (74060).jpg","credit":"https://commons.wikimedia.org/wiki/file:the_fins,_indian_echo_caverns,_hummelstown,_pa.,_near_harrisburg,_pa_(74060).jpg","rec":true,"sched":["9am–5pm","9am–5pm","9am–5pm","9am–5pm"],"ver":true,"event":"","imgsrc":"Wikimedia Commons"},{"n":"Snitz Creek Brewery","cat":"Cervezas","town":"Campbelltown","lat":40.279,"lng":-76.577,"stars":4.6,"nrev":"~400","price":"Pinta $5–7 · Flight $10","hours":"Tarde–noche","days":[1,1,1,1],"why":"Cervecería local sin pretensiones, precios de los mejores de la zona. Nada turístico.","tip":"El más barato de la lista.","q":"Snitz Creek Brewery Campbelltown PA","site":"","mi":6.1,"min":13,"img":"http://static1.squarespace.com/static/58c2ec5de6f2e14660d8e00b/t/674a40a97aa342093ccca8dc/1732919468127/Screenshot%2B2024-11-29%2B172905.jpg?format=1500w","imgname":"","rec":false,"credit":"https://www.snitzcreekbrewery.com/","imgsrc":"sitio oficial","sched":["11:30am–10pm","11:30am–10pm","11:30am–9pm","11:30am–9pm"],"ver":true,"event":""},{"n":"The Vineyard at Hershey","cat":"Eventos","town":"Middletown","lat":40.1876,"lng":-76.7305,"stars":4.5,"nrev":"~900","price":"Entrada gratis · copa $9–12 · flight $15–18","hours":"Vie–Dom, música en vivo por la tarde","days":[1,1,1,1],"why":"Viñedo con vinos y cervezas propias, música en vivo, terraza amplia con vista a los viñedos.","tip":"Espacio abierto — sirve bien para grupo grande con niños corriendo.","q":"The Vineyard at Hershey Middletown PA","site":"https://www.thevineyardathershey.com/","mi":10.1,"min":22,"img":"","imgname":"","rec":false,"sched":["12pm–9pm","12pm–9pm","12pm–7pm","12pm–6pm"],"ver":false,"event":""},{"n":"Reservoir Park","cat":"Miradores","town":"Harrisburg","lat":40.2739,"lng":-76.8614,"stars":4.4,"nrev":"~1.2k","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"El punto más alto de Harrisburg — vista del skyline y el domo del Capitolio. Se llega manejando hasta arriba, cero caminata.","tip":"Mirador para vagos: parquean y ya. Bueno al atardecer.","q":"Reservoir Park Harrisburg PA","site":"","mi":13.9,"min":24,"img":"","imgname":"","rec":false,"sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Mt. Gretna Lake & Beach","cat":"Agua & Aventura","town":"Mt. Gretna","lat":40.2445,"lng":-76.4713,"stars":4.5,"nrev":"~800","price":"$12 adulto · $10 niño","hours":"~11am–7pm — TEMPORADA CIERRA EN LABOR DAY","days":[1,1,1,1],"why":"Lago con playa de arena importada, tobogán de agua, trampolín flotante y snack bar. Ambiente de pueblo de verano de los años 50.","tip":"OJO: normalmente el último día de temporada ES Labor Day. LLAMEN antes de manejar.","q":"Mt Gretna Lake and Beach PA","site":"https://mtgretnalake.com/","mi":14.0,"min":27,"img":"","imgname":"","rec":false,"sched":["11am–7pm","11am–7pm","11am–7pm","ÚLTIMO DÍA de temporada"],"ver":false,"event":"🏖️ El lunes de Labor Day suele ser el ÚLTIMO día de la temporada. Llamen antes."},{"n":"Coleman Memorial Park","cat":"Parques","town":"Lebanon","lat":40.359,"lng":-76.444,"stars":4.6,"nrev":"~1.4k","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Parque municipal grande con playground gigante, piscina, canchas y áreas de picnic con sombra.","tip":"Opción barata para quemar energía de los niños sin pagar nada.","q":"Coleman Memorial Park Lebanon PA","site":"","mi":14.3,"min":26,"img":"","imgname":"","rec":false,"sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Pennsylvania State Capitol","cat":"Conocer","town":"Harrisburg","lat":40.2644,"lng":-76.8835,"stars":4.8,"nrev":"~3.9k","price":"GRATIS (tours guiados gratis)","hours":"Sáb–Dom tours ~9am–4pm (feriado puede cerrar)","days":[1,1,1,0],"why":"Uno de los capitolios más bonitos de EE.UU. — domo dorado inspirado en San Pedro, escalera de mármol, murales. Teddy Roosevelt lo llamó 'el edificio más lindo que he visto'.","tip":"Gratis y espectacular. Confirmen si abre el lunes de Labor Day. Combínenlo con Kipona.","q":"Pennsylvania State Capitol Harrisburg PA","site":"https://www.pacapitol.com/","mi":14.4,"min":25,"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/PA_capitol_view.jpg/960px-PA_capitol_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","imgname":"file:pa capitol view.jpg","credit":"https://commons.wikimedia.org/wiki/file:pa_capitol_view.jpg","rec":true,"sched":["Tours 8:30am–4pm","Tours 9am–4pm","Tours 9am–4pm","Feriado — probablemente cerrado"],"ver":false,"event":"","imgsrc":"Wikimedia Commons"},{"n":"Boyd Big Tree Preserve","cat":"Parques","town":"Harrisburg","lat":40.3544,"lng":-76.8567,"stars":4.7,"nrev":"~450","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"1,000 acres de bosque maduro con árboles enormes. Senderos desde fáciles hasta subida a la cresta.","tip":"Sombra total — el mejor si el día está caliente.","q":"Boyd Big Tree Preserve Conservation Area PA","site":"","mi":14.7,"min":29,"img":"https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png","imgname":"file:boyd big tree.jpg","credit":"https://www.dcnr.pa.gov/StateParks/FindAPark/BoydBigTreePreserveConservationArea/","rec":false,"imgsrc":"sitio oficial","sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Second Mountain Hawk Watch","cat":"Miradores","town":"Fort Indiantown Gap","lat":40.443,"lng":-76.608,"stars":4.7,"nrev":"~200","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Mirador rocoso sobre el valle. Principios de septiembre = pico de migración de halcones y águilas. Se llega casi manejando.","tip":"Poca caminata, mucha vista. Lleven binoculares si tienen.","q":"Second Mountain Hawk Watch Fort Indiantown Gap PA","site":"","mi":14.8,"min":27,"img":"","imgname":"","rec":false,"sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Memorial Lake State Park","cat":"Parques","town":"Grantville","lat":40.4456,"lng":-76.6083,"stars":4.6,"nrev":"~1.1k","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Lago de 85 acres con sendero plano de 1.5 mi alrededor, mesas de picnic, pesca. Muy tranquilo y cerca.","tip":"El parque más fácil de la lista con niños. Traigan comida y hagan picnic.","q":"Memorial Lake State Park Grantville PA","site":"https://www.dcnr.pa.gov/StateParks/FindAPark/MemorialLakeStatePark/","mi":14.8,"min":27,"img":"https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png","imgname":"file:memorial lake state park.jpg","credit":"https://www.dcnr.pa.gov/StateParks/FindAPark/MemorialLakeStatePark/","rec":true,"imgsrc":"sitio oficial","sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Kipona Festival","cat":"Eventos","town":"Harrisburg — City Island","lat":40.2589,"lng":-76.8896,"stars":4.4,"nrev":"1.1k+ (City Island)","price":"GRATIS entrar · comida $10–20 p/p","hours":"Sáb–Lun ~11am–8pm (lun cierra temprano)","days":[0,1,1,1],"why":"El evento más grande del finde. Comida, artesanías, música en vivo, cerveza artesanal y powwow nativo americano junto al río Susquehanna.","tip":"Estacionamiento en City Island se llena — lleguen antes de mediodía o parqueen downtown y crucen el puente peatonal.","q":"Kipona Festival City Island Harrisburg PA","site":"https://harrisburgpa.gov/kipona/","mi":15.3,"min":30,"img":"https://upload.wikimedia.org/wikipedia/commons/e/e9/Kipona_1920.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled","imgname":"file:kipona 1920.jpg","credit":"https://commons.wikimedia.org/wiki/file:kipona_1920.jpg","rec":true,"sched":["No abre viernes","11am–7pm","11am–8pm + fuegos artificiales","11am–6pm"],"ver":true,"event":"🎉 110º Kipona · Family Fun Zone, Giant Puppet Parade, Keystone Dock Dogs, Art in the Park, food trucks, beer/wine garden. FUEGOS ARTIFICIALES el domingo. Parqueo con parquímetro GRATIS domingo y lunes; $5 en River Street Garage el sábado 8am–5pm.","imgsrc":"Wikimedia Commons"},{"n":"Cornwall Iron Furnace","cat":"Conocer","town":"Cornwall","lat":40.2731,"lng":-76.4056,"stars":4.6,"nrev":"~600","price":"$8 adulto · $5 niño","hours":"~9am–5pm (cerrado algunos lunes)","days":[1,1,1,0],"why":"Único horno de hierro del siglo XVIII intacto en el hemisferio occidental. Sitio histórico nacional, chiquito y raro.","tip":"45 min. Cae bien de camino a Mt. Gretna o Governor Dick.","q":"Cornwall Iron Furnace Cornwall PA","site":"https://www.cornwallironfurnace.org/","mi":15.4,"min":30,"img":"","imgname":"","rec":false,"sched":["9am–5pm","9am–5pm","12pm–5pm","Cerrado (feriado)"],"ver":false,"event":""},{"n":"Wildwood Park","cat":"Parques","town":"Harrisburg","lat":40.3036,"lng":-76.8869,"stars":4.7,"nrev":"~1.8k","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Lago con boardwalk de madera sobre el humedal, tortugas, garzas y flores de loto. Sendero plano de 3 mi, se puede hacer un pedazo nomás.","tip":"Cochecitos de bebé pasan sin problema. Combínenlo con Kipona (10 min).","q":"Wildwood Park Harrisburg PA","site":"","mi":16.7,"min":30,"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Wildwood_Park_Harrisburg_PA.jpg/960px-Wildwood_Park_Harrisburg_PA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","imgname":"file:wildwood park harrisburg pa.jpg","credit":"https://commons.wikimedia.org/wiki/file:wildwood_park_harrisburg_pa.jpg","rec":true,"sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":"","imgsrc":"Wikimedia Commons"},{"n":"Fort Hunter Mansion & Park","cat":"Parques","town":"Harrisburg","lat":40.3363,"lng":-76.8953,"stars":4.6,"nrev":"~900","price":"Parque GRATIS · mansión $9 adulto / $5 niño","hours":"Parque amanecer–atardecer · mansión ~10am–4pm","days":[1,1,1,1],"why":"Mansión de 1814 sobre el río Susquehanna, jardines, granero y sendero junto al agua. Vista preciosa del río.","tip":"El parque solo ya vale la pena y es gratis. La mansión es opcional.","q":"Fort Hunter Mansion and Park Harrisburg PA","site":"https://forthunter.org/","mi":17.0,"min":32,"img":"https://forthunter.org/wp-content/uploads/2023/01/Main-Photo.jpg","imgname":"file:fort hunter mansion, fort hunter, dauphin county, pa habs pa,22-fohun,1- (sheet 7 of 9).png","credit":"https://forthunter.org/","rec":false,"imgsrc":"sitio oficial","sched":["Parque amanecer–anochecer · Mansión 10am–4:30pm","Parque amanecer–anochecer · Mansión 10am–4:30pm","Parque amanecer–anochecer · Mansión 12pm–4:30pm","Solo el parque (mansión cierra lunes)"],"ver":true,"event":""},{"n":"Governor Dick Observation Tower","cat":"Miradores","town":"Mt. Gretna / Elizabethtown","lat":40.1733,"lng":-76.4458,"stars":4.7,"nrev":"~1.6k","price":"GRATIS (parqueo gratis)","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"EL MEJOR MIRADOR del área. Torre de concreto de 66 pies que se sube por escaleras interiores — vista 360° de 4 condados. Caminata de ~1 mi ida por bosque, moderada.","tip":"Lo mejor del finde y es gratis. Lleven agua, zapatos cerrados. Adentro de la torre es oscuro — usen la linterna del celular.","q":"Governor Dick Observation Tower Mount Gretna PA","site":"https://parksandtrails.org/","mi":17.6,"min":33,"img":"https://parksandtrails.org/wp-content/uploads/2026/07/Silverwood.jpg","imgname":"","rec":true,"credit":"https://www.parksandtrails.org/","imgsrc":"sitio oficial","sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Swatara State Park","cat":"Parques","town":"Lebanon Co.","lat":40.495,"lng":-76.538,"stars":4.6,"nrev":"~700","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"3,500 acres. Rail-trail plano de grava para caminar o bici, el creek para meter los pies, y fósiles del Devónico en el corte de la carretera.","tip":"Zona de fósiles: los niños encuentran trilobites de verdad. Se pueden llevar.","q":"Swatara State Park PA","site":"https://www.dcnr.pa.gov/StateParks/FindAPark/SwataraStatePark/","mi":19.9,"min":35,"img":"https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png","imgname":"file:waterville bridge in swatara state park haer 462-14.jpg","credit":"https://www.dcnr.pa.gov/StateParks/FindAPark/SwataraStatePark/","rec":false,"imgsrc":"sitio oficial","sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Hawk Rock Overlook","cat":"Miradores","town":"Duncannon","lat":40.383,"lng":-77.023,"stars":4.7,"nrev":"~700","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Caminata en el Appalachian Trail hasta una roca con vista al río Susquehanna y al pueblo de Duncannon.","tip":"~1.2 mi ida, empinado. No para niños chiquitos ni con calor fuerte.","q":"Hawk Rock Overlook Duncannon PA","site":"","mi":27.0,"min":44,"img":"https://appalachiantrail.org/wp-content/uploads/2025/10/wp-share-image.png","imgname":"file:duncannon, pa.jpg","credit":"https://www.appalachiantrail.org/","rec":false,"imgsrc":"sitio oficial","sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""},{"n":"Downtown Lititz","cat":"Conocer","town":"Lititz","lat":40.1573,"lng":-76.3072,"stars":4.8,"nrev":"~2.5k (pueblo)","price":"Caminar GRATIS · Julius Sturgis Pretzel tour $6","hours":"Tiendas ~10am–5pm","days":[1,1,0,1],"why":"Votado 'pueblo más lindo de América'. Calle principal de 1750s, la fábrica de pretzels más vieja del país (haces tu propio pretzel), chocolatería Wilbur, parque con arroyo.","tip":"El paseo más bonito de la lista. Medio día completo. Domingo muchas tiendas cierran.","q":"Downtown Lititz PA","site":"","mi":27.9,"min":44,"img":"http://static1.squarespace.com/static/685ef443cadcf77eacb892b9/t/6925cbf896793e753ff48b31/1764084729026/Fav+Icon+Black+with+Background.png?format=1500w","imgname":"file:125 east main street.jpg","credit":"https://www.lititzpa.com/","rec":false,"imgsrc":"sitio oficial","sched":["Tiendas 10am–6pm","Tiendas 10am–5pm","Muchas tiendas cerradas","Varía — feriado"],"ver":false,"event":"🛍️ Vie 4 y Sáb 5: 'Thanks for the Love Party' en Bunyaad Marketplace — 20% de descuento en todo."},{"n":"Waggoner's Gap Hawk Watch","cat":"Miradores","town":"Carlisle","lat":40.2672,"lng":-77.2247,"stars":4.8,"nrev":"~450","price":"GRATIS","hours":"Amanecer a atardecer","days":[1,1,1,1],"why":"Mirador legendario de Audubon en la cresta de Blue Mountain. En septiembre pasan cientos de rapaces al día. Vista enorme del valle Cumberland.","tip":"Subida corta pero rocosa desde el parqueo. Es el más lejos de esta lista.","q":"Waggoners Gap Hawk Watch Carlisle PA","site":"","mi":35.6,"min":58,"img":"","imgname":"","rec":false,"sched":["Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer","Amanecer–anochecer"],"ver":true,"event":""}];
+const DAYS = ["Vie","Sáb","Dom","Lun"];
+const CATS = ["Todos","⭐ Recomendados","Miradores","Parques","Conocer","Agua & Aventura","Eventos","Cervezas"];
+const COLOR = {"Miradores":"#f0a83a","Parques":"#67c07a","Conocer":"#c98ae0",
+               "Agua & Aventura":"#5eb3e4","Eventos":"#ef7d5a","Cervezas":"#d99a4e"};
+const EMOJI = {"Miradores":"🏔️","Parques":"🌳","Conocer":"🏛️",
+               "Agua & Aventura":"🛶","Eventos":"🎉","Cervezas":"🍺"};
+
+const HP = [40.28736,-76.65803];
+const gmaps = p => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.q);
+const gdir  = p => "https://www.google.com/maps/dir/?api=1&origin=" + HP.join(",") +
+                   "&destination=" + p.lat + "," + p.lng + "&travelmode=driving";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isFree = p => /GRATIS/i.test(p.price);
+
+/* ---------- map ---------- */
+const map = L.map('map',{scrollWheelZoom:false}).setView([40.29,-76.70], 10);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  {attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+
+L.circleMarker(HP,{radius:11,color:"#fff",weight:3,fillColor:"#e0483a",fillOpacity:1})
+ .addTo(map).bindPopup("<b>🎢 Hersheypark</b><br>Punto de partida<br>Happy Hours: 5pm → cierre");
+
+const markers = PLACES.map(p => {
+  const m = L.circleMarker([p.lat,p.lng],{
+    radius: p.rec ? 10 : 7, color:"#140f0d", weight:2,
+    fillColor: COLOR[p.cat] || "#f0a83a", fillOpacity:.95
+  }).bindPopup(
+    `<b>${esc(p.n)}</b>${p.rec?' ⭐':''}<br>${esc(p.town)}<br>
+     ⭐ ${p.stars} Google · <b>${p.mi} mi · ${p.min} min</b><br>
+     💵 ${esc(p.price)}<br>
+     <a href="${gmaps(p)}" target="_blank" rel="noopener">Reviews y horario →</a> ·
+     <a href="${gdir(p)}" target="_blank" rel="noopener">Cómo llegar →</a>`
+  );
+  m.__p = p;
+  return m.addTo(map);
+});
+map.fitBounds(L.featureGroup(markers).getBounds().pad(0.12));
+
+/* ---------- cards ---------- */
+function cardHTML(p){
+  const thumb = p.img
+    ? `style="background-image:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(20,15,13,.78)),url('${p.img}')"`
+    : `style="background:linear-gradient(140deg,${COLOR[p.cat]}33,#2a1e19)"`;
+  const sched = p.sched.map((s,i)=>{
+    const off = /^(—|Cerrad|No abre|Solo el parque)/i.test(s);
+    return `<tr class="${off?'off':''}${i===3?' lastday':''}">
+              <th>${DAYS[i]} ${4+i}</th><td>${esc(s)}</td></tr>`;
+  }).join('');
+  return `
+  <div class="card">
+    <div class="thumb" ${thumb}>
+      ${p.img ? '' : (EMOJI[p.cat]||'📍')}
+      <div class="badges">
+        <span class="pill stars">⭐ ${p.stars}</span>
+        ${p.rec ? '<span class="pill rec">RECOMENDADO</span>'
+                : (isFree(p) ? '<span class="pill free">GRATIS</span>' : '')}
+      </div>
+    </div>
+    <div class="body">
+      <h3>${esc(p.n)}</h3>
+      <div class="town">${EMOJI[p.cat]||''} ${esc(p.town)}</div>
+      ${p.event?`<div class="event">${esc(p.event)}</div>`:''}
+      <dl class="facts">
+        <dt>Distancia</dt><dd><b>${p.mi} mi</b> · ${p.min} min manejando</dd>
+        <dt>Precio</dt><dd class="price">${esc(p.price)}</dd>
+      </dl>
+      <div class="schedhead">
+        Horario del fin de semana
+        <span class="vb ${p.ver?'ok':'chk'}">${p.ver?'✓ confirmado':'⚠ confirmar'}</span>
+      </div>
+      <table class="sched">${sched}</table>
+      <p class="why">${esc(p.why)}</p>
+      <div class="tip">💡 ${esc(p.tip)}</div>
+      <div class="links">
+        <a class="primary" href="${gmaps(p)}" target="_blank" rel="noopener">⭐ Maps + reviews</a>
+        <a href="${gdir(p)}" target="_blank" rel="noopener">🧭 Cómo llegar</a>
+        ${p.site?`<a href="${p.site}" target="_blank" rel="noopener">Web</a>`:''}
+      </div>
+      ${p.credit?`<div class="credit">foto: <a href="${p.credit}" target="_blank" rel="noopener">${esc(p.imgsrc||'fuente')}</a></div>`:''}
+    </div>
+  </div>`;
+}
+
+let curCat = "Todos", curSort = "mi", curDay = -1, onlyEvents = false;
+
+function render(){
+  let list = PLACES.slice();
+  if(curCat === "⭐ Recomendados") list = list.filter(p=>p.rec);
+  else if(curCat !== "Todos")      list = list.filter(p=>p.cat===curCat);
+  if(curDay >= 0) list = list.filter(p=>p.days[curDay]);
+  if(onlyEvents)  list = list.filter(p=>p.event);
+
+  if(curSort==="mi")     list.sort((a,b)=>a.mi-b.mi);
+  if(curSort==="stars")  list.sort((a,b)=>b.stars-a.stars);
+  if(curSort==="free")   list.sort((a,b)=>(isFree(b)-isFree(a)) || a.mi-b.mi);
+
+  document.getElementById('count').textContent =
+    `${list.length} lugares · ${list.filter(isFree).length} gratis · ${list.filter(p=>p.event).length} con evento ese finde`;
+  document.getElementById('cards').innerHTML =
+    `<div class="grid">${list.map(cardHTML).join('')}</div>`;
+
+  const keep = new Set(list.map(p=>p.n));
+  markers.forEach(m => keep.has(m.__p.n) ? m.addTo(map) : map.removeLayer(m));
+}
+
+document.getElementById('bar').innerHTML =
+  CATS.map((c,i)=>`<button data-c="${c}" class="${i?'':'on'}">${c}</button>`).join('') +
+  `<span class="spacer"></span>
+   <select id="dsel">
+     <option value="-1">Cualquier día</option>
+     ${DAYS.map((d,i)=>`<option value="${i}">${d} ${4+i} sept</option>`).join('')}
+   </select>
+   <button id="evb" class="evtoggle">🎉 Solo con evento</button>
+   <select id="ssel">
+     <option value="mi">Más cerca primero</option>
+     <option value="stars">Mejor calificado</option>
+     <option value="free">Gratis primero</option>
+   </select>`;
+
+document.getElementById('bar').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON' || !e.target.dataset.c) return;
+  document.querySelectorAll('#bar button').forEach(b=>b.classList.remove('on'));
+  e.target.classList.add('on');
+  curCat = e.target.dataset.c;
+  render();
+});
+document.getElementById('evb').onclick = e => {
+  onlyEvents = !onlyEvents;
+  e.target.classList.toggle('on', onlyEvents);
+  render();
+};
+document.getElementById('dsel').onchange = e => { curDay = +e.target.value; render(); };
+document.getElementById('ssel').onchange = e => { curSort = e.target.value; render(); };
+
+render();
+setTimeout(()=>map.invalidateSize(),150);
+</script>
+</body>
+</html>
