@@ -48,10 +48,39 @@
     "footContrib": "How to contribute",
     "footIssue": "Report a wrong fact",
     "footCopy": "&copy; 2026 Christopher Tineo. Released under the <a href=\"https://github.com/TineoC/laborday/blob/main/LICENSE\" target=\"_blank\" rel=\"noopener\">MIT license</a>. An informational guide made for a family trip — not affiliated with Hersheypark, The Hershey Company or any of the places listed. Check hours and prices before you head out.",
-    "langLabel": "Idioma / Language"
+    "langLabel": "Idioma / Language",
+    "agendaTitle": "Suggested agenda",
+    "agendaSub": "One plan per day, built around the Happy Hours ticket. Nothing here is booked — swap whatever you want.",
+    "agendaPark": "🎢 Hersheypark — Happy Hours (5pm → close)",
+    "agendaOpt": "optional",
+    "planTitle": "Build your own agenda",
+    "planSub": "Tap a day on any card to add it here. The link at the top of this section carries your plan — send it to whoever you want.",
+    "planEmpty": "Nothing yet. Tap a day on any card below.",
+    "planCopy": "🔗 Copy my agenda",
+    "planCopyOk": "✓ Link copied",
+    "planClear": "🗑️ Clear",
+    "planUseSuggested": "⭐ Start from the suggested agenda",
+    "planRemove": "remove",
+    "planUp": "move up",
+    "planDown": "move down",
+    "planAdd": "Add to:"
   },
 
   "days": ["Fri", "Sat", "Sun", "Mon"],
+
+  "agenda": {
+    "Llegada — la mayoría sale del trabajo": "Arrival — most of us are coming straight from work",
+    "Últimas horas del parque — confirmen la hora de cierre del viernes.": "The park's last hours — check Friday's closing time.",
+    "Cierra a las 10pm el viernes.": "Closes at 10pm on Friday.",
+    "Cierra a las 9pm — solo si llegan temprano.": "Closes at 9pm — only if you get in early.",
+    "Abre 9am–5pm. Ir temprano y salir con tiempo.": "Open 9am–5pm. Go early and leave yourself time.",
+    "Parqueo $5 en River Street Garage el sábado 8am–5pm.": "$5 parking at River Street Garage on Saturday, 8am–5pm.",
+    "Regreso a Hershey": "Drive back to Hershey",
+    "Tours 9am–4pm el domingo.": "Tours 9am–4pm on Sunday.",
+    "Los fuegos artificiales de Kipona son esta noche — hay que elegir.": "Kipona's fireworks are tonight — you have to pick one.",
+    "Amanecer–anochecer, sin horario fijo.": "Dawn–dusk, no set hours.",
+    "Horario especial de Labor Day: 11:30am–9pm.": "Special Labor Day hours: 11:30am–9pm."
+  },
 
   "cats": {
     "Todos": "All",

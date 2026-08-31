@@ -10,6 +10,10 @@ i18n = json.load(open("tools/i18n_en.json"))
 i18n.pop("_comment", None)
 I18N = json.dumps(i18n, ensure_ascii=False, separators=(",", ":"))
 
+agenda = json.load(open("tools/agenda.json"))
+agenda.pop("_comment", None)
+AGENDA = json.dumps(agenda, ensure_ascii=False, separators=(",", ":"))
+
 missing = [p["n"] for p in places if p["n"] not in i18n["places"]]
 if missing:
     raise SystemExit("no English copy for: " + ", ".join(missing))
@@ -28,6 +32,33 @@ leaks = sorted(
 )
 if leaks:
     raise SystemExit("no English for: " + " | ".join(leaks))
+
+# The suggested agenda: every slot has to point at a place that is actually open
+# that day, and every line of Spanish copy in it needs an English twin.
+by_name = {p["n"]: p for p in places}
+bad = []
+if [d.get("d") for d in agenda["days"]] != [0, 1, 2, 3]:
+    bad.append("agenda.days must be exactly d 0,1,2,3 in order")
+for day in agenda["days"]:
+    d = day["d"]
+    for slot in day["slots"]:
+        kinds = [k for k in ("n", "park", "label") if slot.get(k)]
+        if len(kinds) != 1:
+            bad.append(
+                f"day {d} slot {slot.get('t')}: needs exactly one of n/park/label"
+            )
+        if slot.get("n"):
+            p = by_name.get(slot["n"])
+            if not p:
+                bad.append(f"day {d}: no place named {slot['n']!r}")
+            elif not p["days"][d]:
+                bad.append(f"day {d}: {slot['n']} is closed that day")
+        for key in ("label", "note"):
+            s = slot.get(key)
+            if s and s not in i18n["agenda"]:
+                bad.append(f"no English for agenda {key}: {s}")
+if bad:
+    raise SystemExit("agenda.json: " + " | ".join(bad))
 
 HTML = r"""<!DOCTYPE html>
 <html lang="es">
@@ -138,6 +169,42 @@ table.sched tr.lastday th::after{content:" 🇺🇸";font-size:9px}
 
 h2.sec{font-size:14px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
   margin:26px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
+
+/* ---------- agendas (suggested + build-your-own) ---------- */
+.secsub{color:var(--dim);font-size:13px;margin:-6px 0 12px}
+.agdays{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.agday{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+.agday h3{margin:0 0 9px;font-size:15px;color:var(--gold);letter-spacing:-.2px}
+.aslot{display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.agday .aslot:first-of-type{border-top:0}
+.aslot .at{color:var(--gold);font-weight:700;flex:0 0 62px;font-variant-numeric:tabular-nums}
+#plan-days .aslot .at{flex:0 0 20px}   /* "1." needs far less room than "11:30am" */
+.aslot .an{flex:1;min-width:0}
+.aslot .an a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #5a4034}
+.aslot .an a:hover{color:var(--gold)}
+.aslot .ameta{color:var(--dim);font-size:12px;margin-top:2px}
+.aslot .anote{color:#e4d3c6;font-size:12px;margin-top:3px;border-left:2px solid var(--gold);padding-left:7px}
+.aslot.park{background:linear-gradient(90deg,#4a2a12,#33231d);border-radius:8px;padding:8px 9px;
+  border-top:0;margin-top:7px}
+.aslot.park .an{color:#ffd9a0;font-weight:600}
+.aslot.opt{opacity:.72}
+.aslot .aopt{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim)}
+.agempty{color:#6b5a51;font-size:13px;padding:6px 0}
+.planbtns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.planbtns button{background:var(--card);color:var(--ink);border:1px solid var(--line);
+  padding:7px 13px;border-radius:99px;font-size:13.5px;cursor:pointer}
+.planbtns button:hover{border-color:var(--gold);color:var(--gold)}
+.planbtns button.primary{background:var(--gold);color:#2a1a08;border-color:var(--gold);font-weight:700}
+.aslot .arrow{display:flex;gap:4px;align-items:flex-start}
+.aslot .arrow button{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
+  width:22px;height:22px;line-height:1;font-size:12px;cursor:pointer;padding:0}
+.aslot .arrow button:hover{color:var(--gold);border-color:var(--gold)}
+.daytog{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:11px}
+.daytog .lab{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--dim)}
+.daytog button{background:#191210;color:var(--dim);border:1px solid var(--line);
+  font-size:11.5px;padding:3px 9px;border-radius:6px;cursor:pointer}
+.daytog button:hover{border-color:var(--gold);color:var(--gold)}
+.daytog button.on{background:var(--gold);color:#2a1a08;font-weight:700;border-color:var(--gold)}
 footer{color:var(--dim);font-size:12.5px;padding:22px 0 50px;border-top:1px solid var(--line);margin-top:20px}
 .fnote{margin-bottom:12px;line-height:1.6}
 .flinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
@@ -178,6 +245,19 @@ footer a{color:var(--gold)}
     <b>⭐ Las estrellas son de referencia</b>; el botón "Maps + reviews" abre Google Maps con las reales.
   </div>
 
+  <section id="agenda">
+    <h2 class="sec" id="t-agenda-h">Agenda sugerida</h2>
+    <div class="secsub" id="t-agenda-sub"></div>
+    <div class="agdays" id="agenda-days"></div>
+  </section>
+
+  <section id="myplan">
+    <h2 class="sec" id="t-plan-h">Arma tu propia agenda</h2>
+    <div class="secsub" id="t-plan-sub"></div>
+    <div class="planbtns" id="plan-btns"></div>
+    <div class="agdays" id="plan-days"></div>
+  </section>
+
   <div class="quick" id="quick"></div>
 
   <div id="map"></div>
@@ -214,6 +294,7 @@ footer a{color:var(--gold)}
 <script>
 const PLACES = __DATA__;
 const I18N = __I18N__;
+const AGENDA = __AGENDA__;
 const DAYS_ES = ["Vie","Sáb","Dom","Lun"];
 const CATS = ["Todos","⭐ Recomendados","Miradores","Parques","Conocer","Agua & Aventura","Eventos","Cervezas"];
 
@@ -253,7 +334,22 @@ const UI_ES = {
     '<a href="https://github.com/TineoC/laborday/blob/main/LICENSE" target="_blank" rel="noopener">licencia MIT</a>. '+
     'Guía informativa hecha para un viaje familiar — no está afiliada a Hersheypark, The Hershey Company '+
     'ni a ninguno de los lugares listados. Verifiquen horarios y precios antes de salir.',
-  langLabel:"Idioma / Language"
+  langLabel:"Idioma / Language",
+  agendaTitle:"Agenda sugerida",
+  agendaSub:"Un plan por día, armado alrededor del Happy Hours ticket. Nada de esto está reservado — cambien lo que quieran.",
+  agendaPark:"🎢 Hersheypark — Happy Hours (5pm → cierre)",
+  agendaOpt:"opcional",
+  planTitle:"Arma tu propia agenda",
+  planSub:"Toca un día en cualquier tarjeta para agregarlo aquí. El link de esta sección se lleva tu plan — mándaselo a quien quieras.",
+  planEmpty:"Nada todavía. Toca un día en cualquier tarjeta de abajo.",
+  planCopy:"🔗 Copiar mi agenda",
+  planCopyOk:"✓ Link copiado",
+  planClear:"🗑️ Vaciar",
+  planUseSuggested:"⭐ Partir de la agenda sugerida",
+  planRemove:"quitar",
+  planUp:"subir",
+  planDown:"bajar",
+  planAdd:"Agregar a:"
 };
 
 /* system default: first browser language that is en or es, else es */
@@ -274,6 +370,7 @@ const catLabel = c => LANG === "en" ? (I18N.cats[c] || c) : c;
 /* place field with English override; falls back to the Spanish original */
 const tp  = (p,k) => (LANG === "en" && I18N.places[p.n] && I18N.places[p.n][k]) || p[k];
 const tsched  = s => LANG === "en" ? (I18N.sched[s]  || s) : s;
+const tnote   = s => LANG === "en" ? (I18N.agenda[s] || s) : s;
 const timgsrc = s => LANG === "en" ? (I18N.imgsrc[s] || s) : s;
 const COLOR = {"Miradores":"#f0a83a","Parques":"#67c07a","Conocer":"#c98ae0",
                "Agua & Aventura":"#5eb3e4","Eventos":"#ef7d5a","Cervezas":"#d99a4e"};
@@ -286,6 +383,12 @@ const gdir  = p => "https://www.google.com/maps/dir/?api=1&origin=" + HP.join(",
                    "&destination=" + p.lat + "," + p.lng + "&travelmode=driving";
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const isFree = p => /GRATIS/i.test(p.price);
+
+/* slugs come from the name, not the array index — a shared plan has to survive
+   places being added, removed or reordered in the dataset */
+const slug = n => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const BY_SLUG = Object.fromEntries(PLACES.map(p => [slug(p.n), p]));
 
 /* ---------- map ---------- */
 const map = L.map('map',{scrollWheelZoom:false}).setView([40.29,-76.70], 10);
@@ -354,6 +457,13 @@ function cardHTML(p){
         <span class="vb ${p.ver?'ok':'chk'}">${p.ver?T().verOk:T().verChk}</span>
       </div>
       <table class="sched">${sched}</table>
+      <div class="daytog">
+        <span class="lab">${T().planAdd}</span>
+        ${p.days.map((open,i)=> open
+          ? `<button data-s="${slug(p.n)}" data-d="${i}"
+               class="${myPlan[i].includes(slug(p.n))?'on':''}">${DAYS()[i]} ${4+i}</button>`
+          : '').join('')}
+      </div>
       <p class="why">${esc(tp(p,'why'))}</p>
       <div class="tip">💡 ${esc(tp(p,'tip'))}</div>
       <div class="links">
@@ -416,7 +526,145 @@ function initGalleries(){
   }, GAL_MS);
 }
 
-let curCat = "Todos", curSort = "mi", curDay = -1, onlyEvents = false;
+/* ---------- suggested agenda ---------- */
+const DATENUM = i => 4 + i;   /* Fri Sep 4 … Mon Sep 7 */
+
+function slotHTML(s){
+  const cls = "aslot" + (s.park ? " park" : "") + (s.opt ? " opt" : "");
+  const opt = s.opt ? ` <span class="aopt">${T().agendaOpt}</span>` : "";
+  const note = s.note ? `<div class="anote">${esc(tnote(s.note))}</div>` : "";
+  let main;
+  if(s.park){
+    main = `${T().agendaPark}${opt}`;
+  }else if(s.label){
+    main = `${esc(tnote(s.label))}${opt}`;
+  }else{
+    const p = BY_SLUG[slug(s.n)];
+    if(!p) return "";
+    main = `<a href="${gmaps(p)}" target="_blank" rel="noopener">${esc(p.n)}</a>${opt}
+            <div class="ameta">${esc(tp(p,'town'))} · ${p.min} ${T().driving}</div>`;
+  }
+  return `<div class="${cls}"><div class="at">${esc(s.t)}</div>
+            <div class="an">${main}${note}</div></div>`;
+}
+
+function renderAgenda(){
+  document.getElementById('t-agenda-h').textContent   = T().agendaTitle;
+  document.getElementById('t-agenda-sub').textContent = T().agendaSub;
+  document.getElementById('agenda-days').innerHTML = AGENDA.days.map(day =>
+    `<div class="agday">
+       <h3>${DAYS()[day.d]} ${DATENUM(day.d)}</h3>
+       ${day.slots.map(slotHTML).join('')}
+     </div>`).join('');
+}
+
+/* ---------- build-your-own agenda ---------- */
+const PLAN_KEY = "laborday.plan";
+let myPlan = [[],[],[],[]];
+
+function savePlan(){
+  try{ localStorage.setItem(PLAN_KEY, JSON.stringify(myPlan)); }catch{}
+}
+function loadPlan(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(PLAN_KEY) || "null");
+    if(Array.isArray(raw) && raw.length === 4) myPlan = raw.map(cleanDay);
+  }catch{}
+}
+/* whatever comes in from a link or from storage, keep only real, open places */
+const cleanDay = (arr, d) => (Array.isArray(arr) ? arr : [])
+  .filter(s => BY_SLUG[s] && BY_SLUG[s].days[d])
+  .filter((s,i,a) => a.indexOf(s) === i);
+
+const planEmpty = () => myPlan.every(d => !d.length);
+
+function togglePlan(s, d){
+  const at = myPlan[d].indexOf(s);
+  if(at >= 0) myPlan[d].splice(at,1); else myPlan[d].push(s);
+  afterPlanChange();
+}
+function movePlan(s, d, by){
+  const at = myPlan[d].indexOf(s), to = at + by;
+  if(at < 0 || to < 0 || to >= myPlan[d].length) return;
+  myPlan[d].splice(to, 0, myPlan[d].splice(at,1)[0]);
+  afterPlanChange();
+}
+function afterPlanChange(){
+  savePlan();
+  renderMyPlan();
+  render();                     /* card day-toggles reflect the plan */
+}
+
+function planRowHTML(s, d, i, len){
+  const p = BY_SLUG[s];
+  return `<div class="aslot">
+    <div class="at">${i+1}.</div>
+    <div class="an">
+      <a href="${gmaps(p)}" target="_blank" rel="noopener">${esc(p.n)}</a>
+      <div class="ameta">${esc(tp(p,'town'))} · ${p.min} ${T().driving} · ${esc(tsched(p.sched[d]))}</div>
+    </div>
+    <div class="arrow">
+      <button data-mv="-1" data-s="${s}" data-d="${d}" title="${T().planUp}" ${i===0?'disabled':''}>↑</button>
+      <button data-mv="1"  data-s="${s}" data-d="${d}" title="${T().planDown}" ${i===len-1?'disabled':''}>↓</button>
+      <button data-rm="1"  data-s="${s}" data-d="${d}" title="${T().planRemove}">×</button>
+    </div>
+  </div>`;
+}
+
+function renderMyPlan(){
+  document.getElementById('t-plan-h').textContent   = T().planTitle;
+  document.getElementById('t-plan-sub').textContent = T().planSub;
+  document.getElementById('plan-btns').innerHTML =
+    `<button id="plancopy" class="primary">${T().planCopy}</button>
+     <button id="planseed">${T().planUseSuggested}</button>
+     <button id="planclear">${T().planClear}</button>`;
+
+  document.getElementById('plan-days').innerHTML = myPlan.map((day,d) =>
+    `<div class="agday">
+       <h3>${DAYS()[d]} ${DATENUM(d)}</h3>
+       ${day.length
+          ? day.map((s,i)=>planRowHTML(s,d,i,day.length)).join('')
+          : `<div class="agempty">${T().planEmpty}</div>`}
+       ${day.length ? `<div class="aslot park"><div class="at">5pm</div>
+                        <div class="an">${T().agendaPark}</div></div>` : ''}
+     </div>`).join('');
+
+  document.getElementById('plancopy').onclick = async e => {
+    const btn = e.currentTarget;
+    try{
+      await navigator.clipboard.writeText(location.href);
+      btn.textContent = T().planCopyOk;
+    }catch{
+      btn.textContent = location.href;
+    }
+    setTimeout(()=>{ btn.textContent = T().planCopy; }, 2200);
+  };
+  document.getElementById('planclear').onclick = () => { myPlan = [[],[],[],[]]; afterPlanChange(); };
+  document.getElementById('planseed').onclick = () => {
+    myPlan = AGENDA.days.map(day => cleanDay(
+      day.slots.filter(s => s.n).map(s => slug(s.n)), day.d));
+    afterPlanChange();
+  };
+  writeURL();
+}
+
+document.getElementById('plan-days').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b) return;
+  const s = b.dataset.s, d = +b.dataset.d;
+  if(b.dataset.rm) togglePlan(s, d);
+  else if(b.dataset.mv) movePlan(s, d, +b.dataset.mv);
+});
+
+/* the cards are re-rendered wholesale, so the handler lives on the container */
+document.getElementById('cards').addEventListener('click', e => {
+  const b = e.target.closest('.daytog button');
+  if(!b) return;
+  togglePlan(b.dataset.s, +b.dataset.d);
+});
+
+const DEFAULT_CAT = "⭐ Recomendados";
+let curCat = DEFAULT_CAT, curSort = "mi", curDay = -1, onlyEvents = false;
 
 /* --- shareable URLs: ?cat=recomendados&dia=sab&orden=estrellas&evento=1 --- */
 const SLUG = {"Todos":"todos","⭐ Recomendados":"recomendados","Miradores":"miradores",
@@ -438,15 +686,24 @@ function readURL(){
   const s = (q.get("orden")||"").toLowerCase();
   if(UNSORT[s]) curSort = UNSORT[s];
   if(q.get("evento") === "1") onlyEvents = true;
+
+  /* a shared plan wins over whatever this browser had saved, and sticks */
+  if(DAYSLUG.some(k => q.has(k))){
+    myPlan = DAYSLUG.map((k,d) => cleanDay((q.get(k)||"").split(",").filter(Boolean), d));
+    savePlan();
+  }else{
+    loadPlan();
+  }
 }
 
 function writeURL(){
   const q = new URLSearchParams();
-  if(langExplicit)        q.set("lang", LANG);
-  if(curCat !== "Todos")  q.set("cat", SLUG[curCat]);
-  if(curDay >= 0)         q.set("dia", DAYSLUG[curDay]);
-  if(curSort !== "mi")    q.set("orden", SORTSLUG[curSort]);
-  if(onlyEvents)          q.set("evento", "1");
+  if(langExplicit)          q.set("lang", LANG);
+  if(curCat !== DEFAULT_CAT) q.set("cat", SLUG[curCat]);
+  if(curDay >= 0)           q.set("dia", DAYSLUG[curDay]);
+  if(curSort !== "mi")      q.set("orden", SORTSLUG[curSort]);
+  if(onlyEvents)            q.set("evento", "1");
+  myPlan.forEach((day,d) => { if(day.length) q.set(DAYSLUG[d], day.join(",")); });
   const qs = q.toString();
   history.replaceState(null, "", qs ? location.pathname + "?" + qs : location.pathname);
 }
@@ -548,6 +805,8 @@ function applyLang(){
   document.querySelectorAll('.langbar button').forEach(b =>
     b.classList.toggle('on', b.dataset.l === LANG));
   buildQuick();
+  renderAgenda();
+  renderMyPlan();
   buildBar();
   refreshPopups();
   syncControls();
@@ -580,7 +839,11 @@ setTimeout(()=>map.invalidateSize(),150);
 </html>
 """
 
-out = HTML.replace("__DATA__", DATA).replace("__I18N__", I18N)
+out = (
+    HTML.replace("__DATA__", DATA)
+    .replace("__I18N__", I18N)
+    .replace("__AGENDA__", AGENDA)
+)
 open("index.html", "w").write(out)
 print("wrote page:", len(out), "bytes,", len(places), "places")
 print("free:", sum(1 for p in places if "GRATIS" in p["price"]))
